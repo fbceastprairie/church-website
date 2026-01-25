@@ -67,12 +67,13 @@ BEGIN
 END;
 $$;
 
--- IMPORTANT: Drop the function first to allow parameter renaming (fixes error 42P13)
+-- Clean up old functions to avoid confusion
 DROP FUNCTION IF EXISTS create_user(text, text, text);
+DROP FUNCTION IF EXISTS create_new_user(text, text, text);
 
 -- Function to CREATE a new user
--- UPDATED: Parameters renamed to user_* to avoid ambiguity with table columns
-CREATE OR REPLACE FUNCTION create_user(
+-- Renamed to 'create_new_user' to avoid schema cache conflicts
+CREATE OR REPLACE FUNCTION create_new_user(
   user_email text,
   user_password text,
   user_role text
@@ -142,3 +143,6 @@ BEGIN
   RETURN new_user_id;
 END;
 $$;
+
+-- Force schema cache reload (Supabase specific helper)
+NOTIFY pgrst, 'reload config';
