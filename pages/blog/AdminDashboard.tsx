@@ -292,7 +292,7 @@ const AdminDashboard: React.FC = () => {
                                             type="email" 
                                             required
                                             value={newUserEmail}
-                                            onChange={(e) => setNewUserEmail(e.target.value)}
+                                            onChange={(e) => setNewUserEmail(e.target.value.toLowerCase())}
                                             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-church-primary focus:border-church-primary sm:text-sm"
                                         />
                                     </div>

@@ -1,4 +1,5 @@
-import { supabase } from './supabase';
+import { createClient } from '@supabase/supabase-js';
+import { supabase, supabaseUrl, supabaseAnonKey } from './supabase';
 import { BlogPost, UserRole } from "../types";
 
 // INITIALIZATION
@@ -18,15 +19,49 @@ export const getUsers = async (): Promise<any[]> => {
   return data || [];
 };
 
+/**
+ * Creates a new user using a temporary Supabase client.
+ * This ensures the password is hashed correctly by Supabase itself,
+ * avoiding the issues with manual SQL insertion.
+ */
 export const addUser = async (email: string, password: string, role: UserRole): Promise<void> => {
-  const { error } = await supabase.rpc('create_new_user', {
-    user_email: email,
-    user_password: password,
-    user_role: role
+  // 1. Create a temporary client that DOES NOT persist session (Memory storage).
+  // This prevents the Admin from being logged out when creating a new user.
+  const tempClient = createClient(
+    supabaseUrl || '',
+    supabaseAnonKey || '',
+    {
+        auth: {
+            persistSession: false,
+            autoRefreshToken: false,
+            detectSessionInUrl: false
+        }
+    }
+  );
+
+  // 2. Sign up the user officially
+  const { data, error: signUpError } = await tempClient.auth.signUp({
+    email,
+    password,
+    options: {
+        data: { role } // Initial metadata
+    }
   });
 
-  if (error) {
-    throw new Error(error.message); 
+  if (signUpError) throw new Error(signUpError.message);
+  if (!data.user) throw new Error("User creation failed. Email might be taken.");
+
+  // 3. Auto-approve the user via SQL (Skip email verification step)
+  const { error: rpcError } = await supabase.rpc('approve_new_user', {
+    target_user_id: data.user.id,
+    target_role: role
+  });
+
+  if (rpcError) {
+    // If approval fails, try to cleanup (optional, but good practice)
+    console.error("Failed to approve user:", rpcError);
+    await supabase.rpc('delete_user', { target_user_id: data.user.id });
+    throw new Error("Failed to configure user permissions: " + rpcError.message);
   }
 };
 

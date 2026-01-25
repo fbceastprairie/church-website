@@ -18,8 +18,6 @@ CREATE TABLE IF NOT EXISTS public.posts (
 ALTER TABLE public.posts ENABLE ROW LEVEL SECURITY;
 
 -- 3. Create Security Policies
--- We drop existing policies first to prevent "policy already exists" errors when re-running.
-
 DROP POLICY IF EXISTS "Public posts are viewable by everyone" ON public.posts;
 CREATE POLICY "Public posts are viewable by everyone" 
 ON public.posts FOR SELECT 
@@ -42,9 +40,8 @@ USING (auth.role() = 'authenticated');
 
 
 -- 4. TEAM MANAGEMENT FUNCTIONS (RPC)
--- These allow the website Admin Dashboard to list and create users securely.
 
--- Function to GET all users (id, email, role, created_at)
+-- Function to GET all users
 CREATE OR REPLACE FUNCTION get_users()
 RETURNS TABLE (
   id uuid,
@@ -53,7 +50,7 @@ RETURNS TABLE (
   created_at timestamptz
 )
 LANGUAGE plpgsql
-SECURITY DEFINER -- Runs with the privileges of the creator (Admin)
+SECURITY DEFINER
 AS $$
 BEGIN
   RETURN QUERY 
@@ -67,80 +64,29 @@ BEGIN
 END;
 $$;
 
--- Clean up old functions to avoid confusion
-DROP FUNCTION IF EXISTS create_user(text, text, text);
+-- CLEANUP: Remove the old, fragile manual creation function
+DROP FUNCTION IF EXISTS create_new_user(text, text, text);
 
--- Function to CREATE a new user
-CREATE OR REPLACE FUNCTION create_new_user(
-  user_email text,
-  user_password text,
-  user_role text
+-- NEW: Function to APPROVE a user created via the Client SDK
+-- This sets their email to confirmed (skipping email verification) and sets their role.
+CREATE OR REPLACE FUNCTION approve_new_user(
+  target_user_id uuid,
+  target_role text
 )
-RETURNS uuid
+RETURNS void
 LANGUAGE plpgsql
 SECURITY DEFINER
 AS $$
-DECLARE
-  new_user_id uuid;
 BEGIN
-  -- Check if user already exists to avoid hard SQL error
-  IF EXISTS (SELECT 1 FROM auth.users WHERE email = user_email) THEN
-    RAISE EXCEPTION 'User with email % already exists', user_email;
-  END IF;
-
-  -- Create the user in the auth system
-  INSERT INTO auth.users (
-    instance_id,
-    id,
-    aud,
-    role,
-    email,
-    encrypted_password,
-    email_confirmed_at,
-    raw_app_meta_data,
-    raw_user_meta_data,
-    created_at,
-    updated_at,
-    confirmation_token,
-    recovery_token
-  ) VALUES (
-    '00000000-0000-0000-0000-000000000000',
-    gen_random_uuid(),
-    'authenticated',
-    'authenticated',
-    user_email,
-    crypt(user_password, gen_salt('bf')), -- Hash the password securely
-    now(),
-    '{"provider":"email","providers":["email"]}',
-    jsonb_build_object('role', user_role, 'username', split_part(user_email, '@', 1)),
-    now(),
-    now(),
-    '',
-    ''
-  ) RETURNING id INTO new_user_id;
-
-  -- Create identity (Required for login)
-  INSERT INTO auth.identities (
-    id,
-    user_id,
-    identity_data,
-    provider,
-    provider_id, 
-    last_sign_in_at,
-    created_at,
-    updated_at
-  ) VALUES (
-    gen_random_uuid(),
-    new_user_id,
-    format('{"sub":"%s","email":"%s"}', new_user_id, user_email)::jsonb,
-    'email',
-    user_email, 
-    now(),
-    now(),
-    now()
-  );
-
-  RETURN new_user_id;
+  UPDATE auth.users
+  SET 
+    email_confirmed_at = now(), -- Auto-confirm the user
+    raw_user_meta_data = jsonb_set(
+      coalesce(raw_user_meta_data, '{}'::jsonb),
+      '{role}',
+      to_jsonb(target_role)
+    )
+  WHERE id = target_user_id;
 END;
 $$;
 
@@ -152,7 +98,6 @@ SECURITY DEFINER
 AS $$
 BEGIN
   DELETE FROM auth.users WHERE id = target_user_id;
-  -- Note: auth.identities usually cascades, but this ensures the user is gone.
 END;
 $$;
 
@@ -163,12 +108,10 @@ LANGUAGE plpgsql
 SECURITY DEFINER
 AS $$
 BEGIN
-  -- We update the raw_user_meta_data JSON blob where the role is stored
   UPDATE auth.users
   SET raw_user_meta_data = jsonb_set(raw_user_meta_data, '{role}', to_jsonb(new_role))
   WHERE id = target_user_id;
 END;
 $$;
 
--- Force schema cache reload (Supabase specific helper)
 NOTIFY pgrst, 'reload config';
