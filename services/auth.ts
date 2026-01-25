@@ -1,76 +1,33 @@
 import { User } from "../types";
-import { supabase } from "./db";
-import { SUPABASE_URL } from "../constants";
+import { getUsers } from "./db";
 
-const loginInternal = async (username: string, password: string): Promise<User> => {
-  // 1. Authenticate with Supabase Auth
-  // Note: We append a dummy domain because Supabase expects emails, but user wants usernames.
-  const email = `${username}@fbceastprairie.org`;
+// Mock Auth key
+const KEY_CURRENT_USER = 'fbc_ep_current_user';
+
+export const login = async (username: string, password: string): Promise<User> => {
+  const users = await getUsers();
+  const user = users.find((u: any) => u.username === username && u.password === password);
   
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
-
-  if (error || !data.user) {
+  if (!user) {
     throw new Error("Invalid credentials");
   }
 
-  // 2. Fetch the User's Role from the 'profiles' table
-  const { data: profile, error: profileError } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', data.user.id)
-    .single();
-
-  if (profileError || !profile) {
-    throw new Error("User profile not found");
-  }
-
-  // 3. Return the user object
-  return {
-    id: profile.id,
-    username: profile.username,
-    role: profile.role
+  // Sanitize user object (remove password)
+  const safeUser: User = {
+    id: user.id,
+    username: user.username,
+    role: user.role
   };
+
+  localStorage.setItem(KEY_CURRENT_USER, JSON.stringify(safeUser));
+  return safeUser;
 };
 
-export const logout = async () => {
-  await supabase.auth.signOut();
-  localStorage.removeItem('fbc_cached_user');
+export const logout = () => {
+  localStorage.removeItem(KEY_CURRENT_USER);
 };
 
-// Helper to get current session from local storage wrapper (for performance)
-// In a full app, we might use a React Context for this, but this keeps it simple.
 export const getCurrentUser = (): User | null => {
-  // We can try to recover the session from Supabase client
-  const sessionUser = supabase.auth.getSession();
-  
-  // However, `getSession` is async. For this simple synchronous check used in components,
-  // we will rely on a small cached value we set during login.
-  
-  // Let's implement a simpler "Session storage" pattern for the User Object
-  // mirroring what we did in the mock version, but populated by the real login.
-  const stored = localStorage.getItem('fbc_cached_user');
+  const stored = localStorage.getItem(KEY_CURRENT_USER);
   return stored ? JSON.parse(stored) : null;
 };
-
-// We wrap the original login to cache the user object for synchronous access
-export const login = async (u: string, p: string) => {
-    const user = await loginInternal(u, p);
-    localStorage.setItem('fbc_cached_user', JSON.stringify(user));
-    return user;
-}
-
-// Helper to parse project ID for local storage key (internal use)
-function parseProjectId() {
-    try {
-        const url = new URL(SUPABASE_URL);
-        const parts = url.hostname.split('.');
-        // Returns the subdomain (project ID) if available
-        if (parts.length > 0) return parts[0];
-    } catch (e) {
-        console.error("Error parsing Supabase URL", e);
-    }
-    return 'project-id'; 
-}

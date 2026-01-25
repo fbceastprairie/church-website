@@ -1,14 +1,8 @@
 import { ServiceTime } from "./types";
 
-// --- SUPABASE CONFIGURATION ---
-export const SUPABASE_URL = "https://zatdkxmsrfbcziqxifdq.supabase.co";
-
-// Key is reversed to prevent GitHub Secret Scanning from blocking the commit.
-// The raw key string is never present in the source code in a readable format.
-const OBFUSCATED_KEY = "==AO0HSiBve_wbnx9d7Ss6nZYTg4sHh7d_elbiahsilbup_bs";
-export const SUPABASE_PUBLISHABLE_KEY = atob(OBFUSCATED_KEY.split('').reverse().join(''));
-
-// --- ASSETS ---
+// In a real deployment, these would point to the actual uploaded files.
+// For this demo, we use variables so the user can easily swap them later.
+// Note: If you place the user's images in a 'public/assets' folder, update these paths.
 export const ASSETS = {
   // Using placeholders that match the user's description flavor
   STAINED_GLASS_MAIN: 'https://images.unsplash.com/photo-1576510967347-6df1292027b6?q=80&w=1920&auto=format&fit=crop', 
