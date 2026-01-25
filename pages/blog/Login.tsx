@@ -5,7 +5,7 @@ import { login } from '../../services/auth';
 import { initializeDatabase } from '../../services/db';
 
 const Login: React.FC = () => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -22,10 +22,11 @@ const Login: React.FC = () => {
     setError('');
 
     try {
-      await login(username, password);
+      await login(email, password);
       navigate('/blog/admin');
     } catch (err) {
-      setError('Invalid username or password');
+      console.error(err);
+      setError('Invalid email or password');
     } finally {
       setLoading(false);
     }
@@ -46,16 +47,17 @@ const Login: React.FC = () => {
           <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
             <div className="rounded-md shadow-sm -space-y-px">
               <div>
-                <label htmlFor="username" className="sr-only">Username</label>
+                <label htmlFor="email-address" className="sr-only">Email address</label>
                 <input
-                  id="username"
-                  name="username"
-                  type="text"
+                  id="email-address"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
                   required
                   className="appearance-none rounded-none rounded-t-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-church-primary focus:border-church-primary focus:z-10 sm:text-sm"
-                  placeholder="Username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="Email address"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
               <div>
@@ -64,6 +66,7 @@ const Login: React.FC = () => {
                   id="password"
                   name="password"
                   type="password"
+                  autoComplete="current-password"
                   required
                   className="appearance-none rounded-none rounded-b-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-church-primary focus:border-church-primary focus:z-10 sm:text-sm"
                   placeholder="Password"
@@ -90,7 +93,7 @@ const Login: React.FC = () => {
             </div>
           </form>
           <div className="mt-4 text-xs text-center text-gray-400">
-            <p>Default Admin: admin / password123</p>
+            <p>Use the email account created in your Supabase dashboard.</p>
           </div>
         </div>
       </div>

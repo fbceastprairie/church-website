@@ -1,8 +1,11 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Fix: Cast import.meta to any to resolve "Property 'env' does not exist on type 'ImportMeta'"
-const supabaseUrl = (import.meta as any).env.VITE_SUPABASE_URL;
-const supabaseAnonKey = (import.meta as any).env.VITE_SUPABASE_ANON_KEY;
+// Safely access environment variables. 
+// We default to an empty object if (import.meta as any).env is undefined to prevent crashes.
+const env = (import.meta as any).env || {};
+
+const supabaseUrl = env.VITE_SUPABASE_URL;
+const supabaseAnonKey = env.VITE_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
   console.warn("Supabase Environment Variables are missing. Please check your .env file or Netlify settings.");
