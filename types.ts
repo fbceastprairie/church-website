@@ -7,8 +7,6 @@ export interface User {
   id: string;
   username: string;
   role: UserRole;
-  // Password is omitted from the frontend object for safety, 
-  // though in this mock DB it's stored in localstorage
 }
 
 export interface BlogPost {
@@ -19,8 +17,8 @@ export interface BlogPost {
   videoUrl?: string; // YouTube embed URL
   authorId: string;
   authorName: string;
-  createdAt: number;
-  updatedAt: number;
+  createdAt: string; // Changed to string for ISO dates from Supabase
+  updatedAt: string; // Changed to string for ISO dates from Supabase
 }
 
 export interface ServiceTime {

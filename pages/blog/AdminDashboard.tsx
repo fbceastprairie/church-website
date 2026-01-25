@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import Layout from '../../components/Layout';
 import { getCurrentUser, logout } from '../../services/auth';
-import { getPosts, deletePost, addUser } from '../../services/db';
+import { getPosts, deletePost } from '../../services/db';
 import { BlogPost, User, UserRole } from '../../types';
 
 const AdminDashboard: React.FC = () => {
@@ -11,20 +11,17 @@ const AdminDashboard: React.FC = () => {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   
-  // New user form state
-  const [showAddUser, setShowAddUser] = useState(false);
-  const [newUserUser, setNewUserUser] = useState('');
-  const [newUserPass, setNewUserPass] = useState('');
-  const [newUserRole, setNewUserRole] = useState<UserRole>(UserRole.EDITOR);
-
   useEffect(() => {
-    const currentUser = getCurrentUser();
-    if (!currentUser) {
-      navigate('/blog/login');
-      return;
-    }
-    setUser(currentUser);
-    refreshPosts();
+    const init = async () => {
+      const currentUser = await getCurrentUser();
+      if (!currentUser) {
+        navigate('/blog/login');
+        return;
+      }
+      setUser(currentUser);
+      refreshPosts();
+    };
+    init();
   }, [navigate]);
 
   const refreshPosts = async () => {
@@ -33,8 +30,8 @@ const AdminDashboard: React.FC = () => {
     setLoading(false);
   };
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     navigate('/blog/login');
   };
 
@@ -42,20 +39,6 @@ const AdminDashboard: React.FC = () => {
     if (window.confirm("Are you sure you want to delete this post?")) {
       await deletePost(postId);
       refreshPosts();
-    }
-  };
-
-  const handleAddUser = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newUserUser || !newUserPass) return;
-    try {
-      await addUser(newUserUser, newUserPass, newUserRole);
-      alert('User added successfully');
-      setNewUserUser('');
-      setNewUserPass('');
-      setShowAddUser(false);
-    } catch (err: any) {
-      alert(err.message || 'Failed to add user');
     }
   };
 
@@ -88,39 +71,11 @@ const AdminDashboard: React.FC = () => {
             </div>
           </div>
 
-          {/* Admin Only Section: Add Users */}
+          {/* Admin Notice */}
           {user.role === UserRole.ADMIN && (
-            <div className="bg-white shadow rounded-lg mb-8 overflow-hidden">
-                <div 
-                    className="bg-gray-50 px-6 py-4 border-b border-gray-200 cursor-pointer flex justify-between items-center"
-                    onClick={() => setShowAddUser(!showAddUser)}
-                >
-                    <h3 className="text-lg font-medium text-gray-900">User Management</h3>
-                    <span className="text-gray-500">{showAddUser ? '▼' : '►'}</span>
-                </div>
-                {showAddUser && (
-                    <div className="p-6">
-                        <form onSubmit={handleAddUser} className="flex flex-col md:flex-row gap-4 items-end">
-                            <div className="flex-1">
-                                <label className="block text-sm font-medium text-gray-700">Username</label>
-                                <input type="text" value={newUserUser} onChange={e => setNewUserUser(e.target.value)} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" />
-                            </div>
-                            <div className="flex-1">
-                                <label className="block text-sm font-medium text-gray-700">Password</label>
-                                <input type="password" value={newUserPass} onChange={e => setNewUserPass(e.target.value)} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" />
-                            </div>
-                            <div className="w-40">
-                                <label className="block text-sm font-medium text-gray-700">Role</label>
-                                <select value={newUserRole} onChange={e => setNewUserRole(e.target.value as UserRole)} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
-                                    <option value={UserRole.EDITOR}>Editor</option>
-                                    <option value={UserRole.ADMIN}>Admin</option>
-                                </select>
-                            </div>
-                            <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded shadow hover:bg-green-700">Add User</button>
-                        </form>
-                    </div>
-                )}
-            </div>
+             <div className="mb-8 p-4 bg-blue-50 text-blue-800 rounded-lg border border-blue-200 text-sm">
+                <strong>Admin Note:</strong> To add new users or reset passwords, please use the <a href="https://supabase.com/dashboard" target="_blank" rel="noreferrer" className="underline font-bold">Supabase Dashboard</a>.
+             </div>
           )}
 
           {/* Posts List */}

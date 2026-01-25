@@ -1,33 +1,41 @@
-import { User } from "../types";
-import { getUsers } from "./db";
+import { supabase } from './supabase';
+import { User, UserRole } from "../types";
 
-// Mock Auth key
-const KEY_CURRENT_USER = 'fbc_ep_current_user';
+export const login = async (email: string, password: string): Promise<User> => {
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
 
-export const login = async (username: string, password: string): Promise<User> => {
-  const users = await getUsers();
-  const user = users.find((u: any) => u.username === username && u.password === password);
-  
-  if (!user) {
-    throw new Error("Invalid credentials");
+  if (error) {
+    throw new Error(error.message);
   }
 
-  // Sanitize user object (remove password)
-  const safeUser: User = {
-    id: user.id,
-    username: user.username,
-    role: user.role
+  if (!data.user) {
+    throw new Error("Login failed");
+  }
+
+  return {
+    id: data.user.id,
+    username: data.user.user_metadata?.username || email,
+    role: data.user.user_metadata?.role || UserRole.EDITOR
   };
-
-  localStorage.setItem(KEY_CURRENT_USER, JSON.stringify(safeUser));
-  return safeUser;
 };
 
-export const logout = () => {
-  localStorage.removeItem(KEY_CURRENT_USER);
+export const logout = async () => {
+  await supabase.auth.signOut();
 };
 
-export const getCurrentUser = (): User | null => {
-  const stored = localStorage.getItem(KEY_CURRENT_USER);
-  return stored ? JSON.parse(stored) : null;
+export const getCurrentUser = async (): Promise<User | null> => {
+  const { data: { session } } = await supabase.auth.getSession();
+  
+  if (!session?.user) {
+    return null;
+  }
+
+  return {
+    id: session.user.id,
+    username: session.user.user_metadata?.username || session.user.email || 'User',
+    role: session.user.user_metadata?.role || UserRole.EDITOR
+  };
 };

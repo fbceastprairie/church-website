@@ -1,113 +1,140 @@
-import { BlogPost, User, UserRole } from "../types";
-
-// Keys for LocalStorage
-const KEY_USERS = 'fbc_ep_users';
-const KEY_POSTS = 'fbc_ep_posts';
-const KEY_INIT = 'fbc_ep_init';
-
-// Helper to simulate delay
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+import { supabase } from './supabase';
+import { BlogPost, UserRole } from "../types";
 
 // INITIALIZATION
-// This runs once to create the default Admin user.
+// Supabase is persistent, so we don't need to seed it on every load like localStorage.
+// We keep this function to satisfy imports in other files.
 export const initializeDatabase = () => {
-  if (!localStorage.getItem(KEY_INIT)) {
-    console.log("Initializing Mock Database...");
-    
-    // Default Admin User
-    const adminUser = {
-      id: 'admin-1',
-      username: 'admin',
-      password: 'password123', // stored in plain text for this mock only
-      role: UserRole.ADMIN
-    };
-    
-    // Seed Users
-    localStorage.setItem(KEY_USERS, JSON.stringify([adminUser]));
-    
-    // Seed a Welcome Post
-    const welcomePost: BlogPost = {
-      id: 'post-1',
-      title: 'Welcome to our new website!',
-      content: 'We are thrilled to launch our new online home. Check back here for updates, sermon notes, and church news.',
-      authorId: 'admin-1',
-      authorName: 'Admin',
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-      imageUrl: 'https://images.unsplash.com/photo-1438232992991-995b7058bbb3?q=80&w=1000&auto=format&fit=crop'
-    };
-    localStorage.setItem(KEY_POSTS, JSON.stringify([welcomePost]));
-    
-    localStorage.setItem(KEY_INIT, 'true');
-  }
+  // No-op for Supabase
 };
 
 // --- USER OPERATIONS ---
 
 export const getUsers = async (): Promise<any[]> => {
-  await delay(200);
-  const users = localStorage.getItem(KEY_USERS);
-  return users ? JSON.parse(users) : [];
+  // In Supabase, you typically don't list all users from the client side for security.
+  // We'll return an empty array or you could implement a 'profiles' table fetch here.
+  return [];
 };
 
 export const addUser = async (username: string, password: string, role: UserRole): Promise<void> => {
-  await delay(300);
-  const users = await getUsers();
-  if (users.find(u => u.username === username)) {
-    throw new Error("Username already exists");
-  }
-  const newUser = {
-    id: `user-${Date.now()}`,
-    username,
-    password,
-    role
-  };
-  users.push(newUser);
-  localStorage.setItem(KEY_USERS, JSON.stringify(users));
+  // Creating users usually requires the Service Role key or using the Invite API.
+  // For safety, we throw an error instructing the admin to use the Supabase Dashboard.
+  throw new Error("To add new users, please use the 'Authentication' tab in your Supabase Dashboard.");
 };
 
 // --- BLOG OPERATIONS ---
 
 export const getPosts = async (): Promise<BlogPost[]> => {
-  await delay(200); // Simulate network latency
-  const posts = localStorage.getItem(KEY_POSTS);
-  return posts ? JSON.parse(posts).sort((a: BlogPost, b: BlogPost) => b.createdAt - a.createdAt) : [];
+  const { data, error } = await supabase
+    .from('posts')
+    .select('*')
+    .order('createdAt', { ascending: false });
+
+  if (error) {
+    console.error('Error loading posts:', error);
+    return [];
+  }
+
+  // Map database columns to our TypeScript interface if casing differs,
+  // otherwise cast data. Assuming table columns match interface (camelCase or snake_case mapping needed if not).
+  // If your Supabase columns are snake_case (created_at), we map them here.
+  return (data || []).map((post: any) => ({
+    ...post,
+    // Ensure fallback for differences in naming conventions if you used defaults
+    createdAt: post.created_at || post.createdAt,
+    updatedAt: post.updated_at || post.updatedAt,
+    authorId: post.author_id || post.authorId,
+    authorName: post.author_name || post.authorName,
+    videoUrl: post.video_url || post.videoUrl,
+    imageUrl: post.image_url || post.imageUrl
+  }));
 };
 
 export const getPostById = async (id: string): Promise<BlogPost | undefined> => {
-  const posts = await getPosts();
-  return posts.find(p => p.id === id);
+  const { data, error } = await supabase
+    .from('posts')
+    .select('*')
+    .eq('id', id)
+    .single();
+
+  if (error || !data) return undefined;
+
+  return {
+    ...data,
+    createdAt: data.created_at || data.createdAt,
+    updatedAt: data.updated_at || data.updatedAt,
+    authorId: data.author_id || data.authorId,
+    authorName: data.author_name || data.authorName,
+    videoUrl: data.video_url || data.videoUrl,
+    imageUrl: data.image_url || data.imageUrl
+  };
 };
 
 export const createPost = async (post: Omit<BlogPost, 'id' | 'createdAt' | 'updatedAt'>): Promise<BlogPost> => {
-  await delay(400);
-  const posts = await getPosts();
-  const newPost: BlogPost = {
-    ...post,
-    id: `post-${Date.now()}`,
-    createdAt: Date.now(),
-    updatedAt: Date.now(),
+  const newPost = {
+    title: post.title,
+    content: post.content,
+    image_url: post.imageUrl, // Mapping to snake_case for standard SQL convention
+    video_url: post.videoUrl,
+    author_id: post.authorId,
+    author_name: post.authorName,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
   };
-  posts.push(newPost);
-  localStorage.setItem(KEY_POSTS, JSON.stringify(posts));
-  return newPost;
+
+  const { data, error } = await supabase
+    .from('posts')
+    .insert([newPost])
+    .select()
+    .single();
+
+  if (error) throw new Error(error.message);
+
+  return {
+    ...data,
+    createdAt: data.created_at,
+    updatedAt: data.updated_at,
+    authorId: data.author_id,
+    authorName: data.author_name,
+    videoUrl: data.video_url,
+    imageUrl: data.image_url
+  };
 };
 
 export const updatePost = async (id: string, updates: Partial<BlogPost>): Promise<BlogPost> => {
-  await delay(400);
-  const posts = await getPosts();
-  const index = posts.findIndex(p => p.id === id);
-  if (index === -1) throw new Error("Post not found");
-  
-  const updatedPost = { ...posts[index], ...updates, updatedAt: Date.now() };
-  posts[index] = updatedPost;
-  localStorage.setItem(KEY_POSTS, JSON.stringify(posts));
-  return updatedPost;
+  // Map updates to snake_case
+  const dbUpdates: any = {};
+  if (updates.title) dbUpdates.title = updates.title;
+  if (updates.content) dbUpdates.content = updates.content;
+  if (updates.imageUrl) dbUpdates.image_url = updates.imageUrl;
+  if (updates.videoUrl) dbUpdates.video_url = updates.videoUrl;
+  dbUpdates.updated_at = new Date().toISOString();
+
+  const { data, error } = await supabase
+    .from('posts')
+    .update(dbUpdates)
+    .eq('id', id)
+    .select()
+    .single();
+
+  if (error) throw new Error(error.message);
+
+  return {
+    ...data,
+    createdAt: data.created_at,
+    updatedAt: data.updated_at,
+    authorId: data.author_id,
+    authorName: data.author_name,
+    videoUrl: data.video_url,
+    imageUrl: data.image_url
+  };
 };
 
 export const deletePost = async (id: string): Promise<void> => {
-  await delay(300);
-  const posts = await getPosts();
-  const filteredPosts = posts.filter(p => p.id !== id);
-  localStorage.setItem(KEY_POSTS, JSON.stringify(filteredPosts));
+  const { error } = await supabase
+    .from('posts')
+    .delete()
+    .eq('id', id);
+
+  if (error) throw new Error(error.message);
 };

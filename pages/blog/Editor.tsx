@@ -3,32 +3,35 @@ import { useNavigate, useParams } from 'react-router-dom';
 import Layout from '../../components/Layout';
 import { getCurrentUser } from '../../services/auth';
 import { createPost, getPostById, updatePost } from '../../services/db';
-import { BlogPost, UserRole } from '../../types';
+import { User, UserRole } from '../../types';
 
 const Editor: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const user = getCurrentUser();
   const isEditing = !!id;
 
+  const [user, setUser] = useState<User | null>(null);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [videoUrl, setVideoUrl] = useState('');
   const [loading, setLoading] = useState(false);
-  const [fetchLoading, setFetchLoading] = useState(isEditing);
+  const [fetchLoading, setFetchLoading] = useState(true);
 
   useEffect(() => {
-    if (!user) {
-      navigate('/blog/login');
-      return;
-    }
+    const init = async () => {
+      const currentUser = await getCurrentUser();
+      if (!currentUser) {
+        navigate('/blog/login');
+        return;
+      }
+      setUser(currentUser);
 
-    if (isEditing && id) {
-      getPostById(id).then(post => {
+      if (isEditing && id) {
+        const post = await getPostById(id);
         if (post) {
             // Permission check: Admin can edit all, Editor can only edit own
-            if (user.role !== UserRole.ADMIN && post.authorId !== user.id) {
+            if (currentUser.role !== UserRole.ADMIN && post.authorId !== currentUser.id) {
                 alert("You do not have permission to edit this post.");
                 navigate('/blog/admin');
                 return;
@@ -38,10 +41,12 @@ const Editor: React.FC = () => {
           setImageUrl(post.imageUrl || '');
           setVideoUrl(post.videoUrl || '');
         }
-        setFetchLoading(false);
-      });
-    }
-  }, [id, isEditing, user, navigate]);
+      }
+      setFetchLoading(false);
+    };
+
+    init();
+  }, [id, isEditing, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
