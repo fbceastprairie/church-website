@@ -15,10 +15,15 @@ export const login = async (email: string, password: string): Promise<User> => {
     throw new Error("Login failed");
   }
 
+  // If role is not explicitly set in metadata, we default to ADMIN.
+  // This ensures users created manually in the Supabase dashboard have admin access.
+  const role = (data.user.user_metadata?.role as UserRole) || UserRole.ADMIN;
+
   return {
     id: data.user.id,
-    username: data.user.user_metadata?.username || email,
-    role: data.user.user_metadata?.role || UserRole.EDITOR
+    // Use the part of the email before '@' as a username if one isn't set
+    username: data.user.user_metadata?.username || email.split('@')[0],
+    role: role
   };
 };
 
@@ -33,9 +38,11 @@ export const getCurrentUser = async (): Promise<User | null> => {
     return null;
   }
 
+  const role = (session.user.user_metadata?.role as UserRole) || UserRole.ADMIN;
+
   return {
     id: session.user.id,
-    username: session.user.user_metadata?.username || session.user.email || 'User',
-    role: session.user.user_metadata?.role || UserRole.EDITOR
+    username: session.user.user_metadata?.username || session.user.email?.split('@')[0] || 'User',
+    role: role
   };
 };
