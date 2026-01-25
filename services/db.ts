@@ -2,8 +2,6 @@ import { supabase } from './supabase';
 import { BlogPost, UserRole } from "../types";
 
 // INITIALIZATION
-// Supabase is persistent, so we don't need to seed it on every load like localStorage.
-// We keep this function to satisfy imports in other files.
 export const initializeDatabase = () => {
   // No-op for Supabase
 };
@@ -11,15 +9,26 @@ export const initializeDatabase = () => {
 // --- USER OPERATIONS ---
 
 export const getUsers = async (): Promise<any[]> => {
-  // In Supabase, you typically don't list all users from the client side for security.
-  // We'll return an empty array or you could implement a 'profiles' table fetch here.
-  return [];
+  const { data, error } = await supabase.rpc('get_users');
+  
+  if (error) {
+    console.error('Error fetching users:', error);
+    return [];
+  }
+  return data || [];
 };
 
-export const addUser = async (username: string, password: string, role: UserRole): Promise<void> => {
-  // Creating users usually requires the Service Role key or using the Invite API.
-  // For safety, we throw an error instructing the admin to use the Supabase Dashboard.
-  throw new Error("To add new users, please use the 'Authentication' tab in your Supabase Dashboard.");
+export const addUser = async (email: string, password: string, role: UserRole): Promise<void> => {
+  // We use a secure Remote Procedure Call (RPC) to create users on the server side
+  const { error } = await supabase.rpc('create_user', {
+    email,
+    password,
+    role
+  });
+
+  if (error) {
+    throw new Error(error.message); 
+  }
 };
 
 // --- BLOG OPERATIONS ---
@@ -35,12 +44,8 @@ export const getPosts = async (): Promise<BlogPost[]> => {
     return [];
   }
 
-  // Map database columns to our TypeScript interface if casing differs,
-  // otherwise cast data. Assuming table columns match interface (camelCase or snake_case mapping needed if not).
-  // If your Supabase columns are snake_case (created_at), we map them here.
   return (data || []).map((post: any) => ({
     ...post,
-    // Ensure fallback for differences in naming conventions if you used defaults
     createdAt: post.created_at || post.createdAt,
     updatedAt: post.updated_at || post.updatedAt,
     authorId: post.author_id || post.authorId,
@@ -74,7 +79,7 @@ export const createPost = async (post: Omit<BlogPost, 'id' | 'createdAt' | 'upda
   const newPost = {
     title: post.title,
     content: post.content,
-    image_url: post.imageUrl, // Mapping to snake_case for standard SQL convention
+    image_url: post.imageUrl, 
     video_url: post.videoUrl,
     author_id: post.authorId,
     author_name: post.authorName,
@@ -102,7 +107,6 @@ export const createPost = async (post: Omit<BlogPost, 'id' | 'createdAt' | 'upda
 };
 
 export const updatePost = async (id: string, updates: Partial<BlogPost>): Promise<BlogPost> => {
-  // Map updates to snake_case
   const dbUpdates: any = {};
   if (updates.title) dbUpdates.title = updates.title;
   if (updates.content) dbUpdates.content = updates.content;

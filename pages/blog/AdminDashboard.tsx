@@ -2,15 +2,24 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import Layout from '../../components/Layout';
 import { getCurrentUser, logout } from '../../services/auth';
-import { getPosts, deletePost } from '../../services/db';
+import { getPosts, deletePost, getUsers, addUser } from '../../services/db';
 import { BlogPost, User, UserRole } from '../../types';
 
 const AdminDashboard: React.FC = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
   const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [staffList, setStaffList] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   
+  // New User Form State
+  const [showAddUser, setShowAddUser] = useState(false);
+  const [newUserEmail, setNewUserEmail] = useState('');
+  const [newUserPassword, setNewUserPassword] = useState('');
+  const [newUserRole, setNewUserRole] = useState<UserRole>(UserRole.EDITOR);
+  const [userError, setUserError] = useState('');
+  const [userSuccess, setUserSuccess] = useState('');
+
   useEffect(() => {
     const init = async () => {
       const currentUser = await getCurrentUser();
@@ -19,14 +28,21 @@ const AdminDashboard: React.FC = () => {
         return;
       }
       setUser(currentUser);
-      refreshPosts();
+      await refreshData(currentUser);
     };
     init();
   }, [navigate]);
 
-  const refreshPosts = async () => {
-    const data = await getPosts();
-    setPosts(data);
+  const refreshData = async (currentUser: User) => {
+    setLoading(true);
+    const postData = await getPosts();
+    setPosts(postData);
+    
+    // Only fetch users if Admin
+    if (currentUser.role === UserRole.ADMIN) {
+        const usersData = await getUsers();
+        setStaffList(usersData);
+    }
     setLoading(false);
   };
 
@@ -38,7 +54,27 @@ const AdminDashboard: React.FC = () => {
   const handleDelete = async (postId: string) => {
     if (window.confirm("Are you sure you want to delete this post?")) {
       await deletePost(postId);
-      refreshPosts();
+      const updatedPosts = await getPosts();
+      setPosts(updatedPosts);
+    }
+  };
+
+  const handleAddUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setUserError('');
+    setUserSuccess('');
+
+    try {
+        await addUser(newUserEmail, newUserPassword, newUserRole);
+        setUserSuccess(`User ${newUserEmail} created successfully!`);
+        setNewUserEmail('');
+        setNewUserPassword('');
+        setShowAddUser(false);
+        // Refresh list
+        if (user) refreshData(user);
+    } catch (err: any) {
+        console.error(err);
+        setUserError(err.message || "Failed to create user. Please ensure you have run the database setup script.");
     }
   };
 
@@ -53,7 +89,7 @@ const AdminDashboard: React.FC = () => {
           <div className="md:flex md:items-center md:justify-between mb-8">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-              <p className="text-gray-600">Welcome, {user.username} ({user.role})</p>
+              <p className="text-gray-600">Welcome, {user.username} <span className="text-xs bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full uppercase ml-1">{user.role}</span></p>
             </div>
             <div className="mt-4 md:mt-0 flex space-x-3">
               <Link
@@ -71,67 +107,153 @@ const AdminDashboard: React.FC = () => {
             </div>
           </div>
 
-          {/* Admin Notice */}
-          {user.role === UserRole.ADMIN && (
-             <div className="mb-8 p-4 bg-blue-50 text-blue-800 rounded-lg border border-blue-200 text-sm">
-                <strong>Admin Note:</strong> To add new users or reset passwords, please use the <a href="https://supabase.com/dashboard" target="_blank" rel="noreferrer" className="underline font-bold">Supabase Dashboard</a>.
-             </div>
-          )}
-
-          {/* Posts List */}
-          <div className="bg-white shadow rounded-lg overflow-hidden">
-             <div className="px-6 py-4 border-b border-gray-200">
-                <h3 className="text-lg font-medium text-gray-900">Manage Articles</h3>
-             </div>
-             
-             {loading ? (
-                 <div className="p-10 text-center">Loading posts...</div>
-             ) : posts.length === 0 ? (
-                 <div className="p-10 text-center text-gray-500">No articles found. Write your first one!</div>
-             ) : (
-                 <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
-                            <tr>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Author</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                            {posts.map(post => {
-                                const canEdit = user.role === UserRole.ADMIN || post.authorId === user.id;
-                                
-                                return (
-                                    <tr key={post.id} className={!canEdit ? "opacity-50 bg-gray-50" : ""}>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <div className="text-sm font-medium text-gray-900">{post.title}</div>
-                                            {!canEdit && <span className="text-xs text-red-400">Read only</span>}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {post.authorName}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {new Date(post.createdAt).toLocaleDateString()}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            {canEdit && (
-                                                <>
-                                                    <Link to={`/blog/editor/${post.id}`} className="text-indigo-600 hover:text-indigo-900 mr-4">Edit</Link>
-                                                    <button onClick={() => handleDelete(post.id)} className="text-red-600 hover:text-red-900">Delete</button>
-                                                </>
-                                            )}
-                                        </td>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Left Column: Posts (Takes up 2 cols) */}
+            <div className="lg:col-span-2 space-y-8">
+                {/* Posts List */}
+                <div className="bg-white shadow rounded-lg overflow-hidden">
+                    <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                        <h3 className="text-lg font-medium text-gray-900">Manage Articles</h3>
+                    </div>
+                    
+                    {loading ? (
+                        <div className="p-10 text-center">Loading...</div>
+                    ) : posts.length === 0 ? (
+                        <div className="p-10 text-center text-gray-500">No articles found. Write your first one!</div>
+                    ) : (
+                        <div className="overflow-x-auto">
+                            <table className="min-w-full divide-y divide-gray-200">
+                                <thead className="bg-gray-50">
+                                    <tr>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                                     </tr>
-                                );
-                            })}
-                        </tbody>
-                    </table>
-                 </div>
-             )}
-          </div>
+                                </thead>
+                                <tbody className="bg-white divide-y divide-gray-200">
+                                    {posts.map(post => {
+                                        const canEdit = user.role === UserRole.ADMIN || post.authorId === user.id;
+                                        
+                                        return (
+                                            <tr key={post.id} className={!canEdit ? "opacity-50 bg-gray-50" : ""}>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <div className="text-sm font-medium text-gray-900 truncate max-w-[200px]">{post.title}</div>
+                                                    {!canEdit && <span className="text-xs text-red-400">Read only</span>}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                    {new Date(post.createdAt).toLocaleDateString()}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                                    {canEdit && (
+                                                        <>
+                                                            <Link to={`/blog/editor/${post.id}`} className="text-indigo-600 hover:text-indigo-900 mr-4">Edit</Link>
+                                                            <button onClick={() => handleDelete(post.id)} className="text-red-600 hover:text-red-900">Delete</button>
+                                                        </>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+                </div>
+            </div>
 
+            {/* Right Column: Team Management (Admin Only) */}
+            <div className="lg:col-span-1">
+                {user.role === UserRole.ADMIN && (
+                    <div className="bg-white shadow rounded-lg overflow-hidden">
+                        <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
+                            <h3 className="text-lg font-medium text-gray-900">Team Management</h3>
+                            <button 
+                                onClick={() => setShowAddUser(!showAddUser)}
+                                className="text-xs bg-church-primary text-white px-3 py-1 rounded hover:bg-blue-800"
+                            >
+                                {showAddUser ? 'Close' : '+ Add User'}
+                            </button>
+                        </div>
+
+                        {userSuccess && (
+                            <div className="px-6 py-3 bg-green-50 text-green-700 text-sm border-b border-green-100">
+                                {userSuccess}
+                            </div>
+                        )}
+                         {userError && (
+                            <div className="px-6 py-3 bg-red-50 text-red-700 text-sm border-b border-red-100">
+                                {userError}
+                            </div>
+                        )}
+
+                        {/* Add User Form */}
+                        {showAddUser && (
+                            <div className="p-6 bg-blue-50 border-b border-blue-100">
+                                <form onSubmit={handleAddUser} className="space-y-4">
+                                    <div>
+                                        <label className="block text-xs font-medium text-gray-700">Email Address</label>
+                                        <input 
+                                            type="email" 
+                                            required
+                                            value={newUserEmail}
+                                            onChange={(e) => setNewUserEmail(e.target.value)}
+                                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-church-primary focus:border-church-primary sm:text-sm"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-medium text-gray-700">Password</label>
+                                        <input 
+                                            type="password" 
+                                            required
+                                            minLength={6}
+                                            value={newUserPassword}
+                                            onChange={(e) => setNewUserPassword(e.target.value)}
+                                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-church-primary focus:border-church-primary sm:text-sm"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-medium text-gray-700">Role</label>
+                                        <select
+                                            value={newUserRole}
+                                            onChange={(e) => setNewUserRole(e.target.value as UserRole)}
+                                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-church-primary focus:border-church-primary sm:text-sm"
+                                        >
+                                            <option value={UserRole.EDITOR}>Editor (Can post)</option>
+                                            <option value={UserRole.ADMIN}>Admin (Full Access)</option>
+                                        </select>
+                                    </div>
+                                    <button 
+                                        type="submit"
+                                        className="w-full bg-church-accent text-white py-2 px-4 rounded hover:bg-yellow-600 text-sm font-bold"
+                                    >
+                                        Create User
+                                    </button>
+                                </form>
+                            </div>
+                        )}
+
+                        {/* Staff List */}
+                        <div className="divide-y divide-gray-100">
+                            {staffList.length === 0 ? (
+                                <p className="p-6 text-sm text-gray-500 italic">No other staff found (or database functions not set up).</p>
+                            ) : (
+                                staffList.map((staff: any) => (
+                                    <div key={staff.id} className="px-6 py-4 flex items-center justify-between">
+                                        <div className="overflow-hidden">
+                                            <p className="text-sm font-medium text-gray-900 truncate">{staff.email}</p>
+                                            <p className="text-xs text-gray-500">Joined: {new Date(staff.created_at).toLocaleDateString()}</p>
+                                        </div>
+                                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${staff.role === 'ADMIN' ? 'bg-purple-100 text-purple-800' : 'bg-green-100 text-green-800'}`}>
+                                            {staff.role || 'User'}
+                                        </span>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </div>
+                )}
+            </div>
+          </div>
         </div>
       </div>
     </Layout>
