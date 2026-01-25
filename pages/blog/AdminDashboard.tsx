@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import Layout from '../../components/Layout';
-import { getCurrentUser, logout } from '../../services/auth';
+import { getCurrentUser, logout, updatePassword } from '../../services/auth';
 import { getPosts, deletePost, getUsers, addUser } from '../../services/db';
 import { BlogPost, User, UserRole } from '../../types';
 
@@ -12,13 +12,18 @@ const AdminDashboard: React.FC = () => {
   const [staffList, setStaffList] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   
-  // New User Form State
+  // New User Form State (Admin Only)
   const [showAddUser, setShowAddUser] = useState(false);
   const [newUserEmail, setNewUserEmail] = useState('');
   const [newUserPassword, setNewUserPassword] = useState('');
   const [newUserRole, setNewUserRole] = useState<UserRole>(UserRole.EDITOR);
   const [userError, setUserError] = useState('');
   const [userSuccess, setUserSuccess] = useState('');
+
+  // Change Password State (All Users)
+  const [newPassword, setNewPassword] = useState('');
+  const [passwordMessage, setPasswordMessage] = useState({ type: '', text: '' });
+  const [showPasswordForm, setShowPasswordForm] = useState(false);
 
   useEffect(() => {
     const init = async () => {
@@ -75,6 +80,25 @@ const AdminDashboard: React.FC = () => {
     } catch (err: any) {
         console.error(err);
         setUserError(err.message || "Failed to create user. Please ensure you have run the database setup script.");
+    }
+  };
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPasswordMessage({ type: '', text: '' });
+    
+    if (newPassword.length < 6) {
+        setPasswordMessage({ type: 'error', text: 'Password must be at least 6 characters.' });
+        return;
+    }
+
+    try {
+        await updatePassword(newPassword);
+        setPasswordMessage({ type: 'success', text: 'Password updated successfully!' });
+        setNewPassword('');
+        setShowPasswordForm(false);
+    } catch (err: any) {
+        setPasswordMessage({ type: 'error', text: err.message || 'Failed to update password.' });
     }
   };
 
@@ -161,8 +185,54 @@ const AdminDashboard: React.FC = () => {
                 </div>
             </div>
 
-            {/* Right Column: Team Management (Admin Only) */}
-            <div className="lg:col-span-1">
+            {/* Right Column: Account & Team Management */}
+            <div className="lg:col-span-1 space-y-8">
+                
+                {/* 1. My Account (Visible to everyone) */}
+                <div className="bg-white shadow rounded-lg overflow-hidden">
+                    <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
+                        <h3 className="text-lg font-medium text-gray-900">My Account</h3>
+                        <button 
+                            onClick={() => setShowPasswordForm(!showPasswordForm)}
+                            className="text-xs text-blue-600 hover:text-blue-800 font-medium"
+                        >
+                            {showPasswordForm ? 'Cancel' : 'Change Password'}
+                        </button>
+                    </div>
+                    
+                    {passwordMessage.text && (
+                        <div className={`px-6 py-3 text-sm border-b ${passwordMessage.type === 'error' ? 'bg-red-50 text-red-700 border-red-100' : 'bg-green-50 text-green-700 border-green-100'}`}>
+                            {passwordMessage.text}
+                        </div>
+                    )}
+
+                    {showPasswordForm && (
+                        <div className="p-6">
+                            <form onSubmit={handleChangePassword}>
+                                <div className="mb-3">
+                                    <label className="block text-xs font-medium text-gray-700 mb-1">New Password</label>
+                                    <input 
+                                        type="password" 
+                                        required
+                                        minLength={6}
+                                        value={newPassword}
+                                        onChange={(e) => setNewPassword(e.target.value)}
+                                        className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-church-primary focus:border-church-primary sm:text-sm"
+                                        placeholder="Min. 6 characters"
+                                    />
+                                </div>
+                                <button 
+                                    type="submit"
+                                    className="w-full bg-church-primary text-white py-2 px-4 rounded hover:bg-blue-800 text-sm font-bold"
+                                >
+                                    Update Password
+                                </button>
+                            </form>
+                        </div>
+                    )}
+                </div>
+
+                {/* 2. Team Management (Admin Only) */}
                 {user.role === UserRole.ADMIN && (
                     <div className="bg-white shadow rounded-lg overflow-hidden">
                         <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">

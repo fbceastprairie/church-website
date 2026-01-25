@@ -66,3 +66,11 @@ export const getCurrentUser = async (): Promise<User | null> => {
     role: determineRole(session.user)
   };
 };
+
+export const updatePassword = async (password: string): Promise<void> => {
+  const { error } = await supabase.auth.updateUser({ password });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+};
