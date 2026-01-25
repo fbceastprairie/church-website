@@ -69,10 +69,8 @@ $$;
 
 -- Clean up old functions to avoid confusion
 DROP FUNCTION IF EXISTS create_user(text, text, text);
-DROP FUNCTION IF EXISTS create_new_user(text, text, text);
 
 -- Function to CREATE a new user
--- Renamed to 'create_new_user' to avoid schema cache conflicts
 CREATE OR REPLACE FUNCTION create_new_user(
   user_email text,
   user_password text,
@@ -127,6 +125,7 @@ BEGIN
     user_id,
     identity_data,
     provider,
+    provider_id, 
     last_sign_in_at,
     created_at,
     updated_at
@@ -135,12 +134,39 @@ BEGIN
     new_user_id,
     format('{"sub":"%s","email":"%s"}', new_user_id, user_email)::jsonb,
     'email',
+    user_email, 
     now(),
     now(),
     now()
   );
 
   RETURN new_user_id;
+END;
+$$;
+
+-- Function to DELETE a user
+CREATE OR REPLACE FUNCTION delete_user(target_user_id uuid)
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+  DELETE FROM auth.users WHERE id = target_user_id;
+  -- Note: auth.identities usually cascades, but this ensures the user is gone.
+END;
+$$;
+
+-- Function to UPDATE a user's role
+CREATE OR REPLACE FUNCTION update_user_role(target_user_id uuid, new_role text)
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+  -- We update the raw_user_meta_data JSON blob where the role is stored
+  UPDATE auth.users
+  SET raw_user_meta_data = jsonb_set(raw_user_meta_data, '{role}', to_jsonb(new_role))
+  WHERE id = target_user_id;
 END;
 $$;
 

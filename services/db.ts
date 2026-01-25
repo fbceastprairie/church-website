@@ -19,9 +19,6 @@ export const getUsers = async (): Promise<any[]> => {
 };
 
 export const addUser = async (email: string, password: string, role: UserRole): Promise<void> => {
-  // We use a secure Remote Procedure Call (RPC) to create users on the server side
-  // Params must match the names defined in the SQL function 'create_new_user'
-  // We use 'create_new_user' instead of 'create_user' to ensure no caching conflicts occur.
   const { error } = await supabase.rpc('create_new_user', {
     user_email: email,
     user_password: password,
@@ -30,6 +27,27 @@ export const addUser = async (email: string, password: string, role: UserRole): 
 
   if (error) {
     throw new Error(error.message); 
+  }
+};
+
+export const deleteUser = async (userId: string): Promise<void> => {
+  const { error } = await supabase.rpc('delete_user', {
+    target_user_id: userId
+  });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+};
+
+export const updateUserRole = async (userId: string, newRole: UserRole): Promise<void> => {
+  const { error } = await supabase.rpc('update_user_role', {
+    target_user_id: userId,
+    new_role: newRole
+  });
+
+  if (error) {
+    throw new Error(error.message);
   }
 };
 
