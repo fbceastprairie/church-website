@@ -1,9 +1,9 @@
 import { ServiceTime } from "./types";
 
 // --- SUPABASE CONFIGURATION ---
-// TODO: Replace these with your actual Project URL and Anon Key from Supabase Dashboard > Settings > API
-export const SUPABASE_URL = "https://your-project-id.supabase.co";
-export const SUPABASE_ANON_KEY = "your-anon-public-key-goes-here";
+// TODO: Replace these with your actual Project URL and Publishable Key from Supabase Dashboard > Settings > API
+export const SUPABASE_URL = "https://zatdkxmsrfbcziqxifdq.supabase.co";
+export const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_h7hHs4gTYZn6sS1d79xnwA_evBiSH08";
 
 // --- ASSETS ---
 export const ASSETS = {

@@ -1,5 +1,6 @@
 import { User } from "../types";
 import { supabase } from "./db";
+import { SUPABASE_URL } from "../constants";
 
 const loginInternal = async (username: string, password: string): Promise<User> => {
   // 1. Authenticate with Supabase Auth
@@ -46,14 +47,7 @@ export const getCurrentUser = (): User | null => {
   const sessionUser = supabase.auth.getSession();
   
   // However, `getSession` is async. For this simple synchronous check used in components,
-  // we will rely on a small cached value we set during login, 
-  // or we would need to refactor the whole app to be async auth aware.
-  // For this scope, let's assume if the cached user exists, they are logged in.
-  const cached = localStorage.getItem('sb-' + parseProjectId() + '-auth-token'); 
-  
-  // Real implementation: We'd verify the JWT. 
-  // For now, we rely on the component state in AdminDashboard mostly.
-  // But wait, the previous app relied on `getCurrentUser` returning a User object synchronously.
+  // we will rely on a small cached value we set during login.
   
   // Let's implement a simpler "Session storage" pattern for the User Object
   // mirroring what we did in the mock version, but populated by the real login.
@@ -70,6 +64,13 @@ export const login = async (u: string, p: string) => {
 
 // Helper to parse project ID for local storage key (internal use)
 function parseProjectId() {
-    // Attempt to parse from URL in constants, fallback to generic
+    try {
+        const url = new URL(SUPABASE_URL);
+        const parts = url.hostname.split('.');
+        // Returns the subdomain (project ID) if available
+        if (parts.length > 0) return parts[0];
+    } catch (e) {
+        console.error("Error parsing Supabase URL", e);
+    }
     return 'project-id'; 
 }
