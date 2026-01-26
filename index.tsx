@@ -1,20 +1,14 @@
-
 import React from 'react';
 import { createRoot } from 'react-dom/client';
+import App from './App.tsx';
 
 console.log("FBC Website: Entry point initialized.");
 
-async function startApp() {
-  const container = document.getElementById('root');
-  const loadingScreen = document.getElementById('loading-screen');
+const container = document.getElementById('root');
+const loadingScreen = document.getElementById('loading-screen');
 
-  if (!container) return;
-
+if (container) {
   try {
-    // We use dynamic import so that resolution errors (404s on .ts files) 
-    // are caught by this catch block rather than failing the whole script silently.
-    const { default: App } = await import('./App.tsx');
-    
     const root = createRoot(container);
     root.render(
       <React.StrictMode>
@@ -55,5 +49,3 @@ async function startApp() {
     `;
   }
 }
-
-startApp();
