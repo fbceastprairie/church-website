@@ -8,18 +8,15 @@ const Navbar: React.FC = () => {
 
   const toggleMenu = () => setIsOpen(!isOpen);
 
-  // Helper for determining text style state
   const getLinkClasses = (path: string, isMobile = false) => {
     const isActive = location.pathname === path;
     
     if (isMobile) {
-        // Mobile Layout (Simple Vertical List)
         return isActive 
             ? 'text-church-accent font-bold' 
             : 'text-gray-200 hover:text-white hover:font-bold';
     }
 
-    // Desktop Layout (Color & Weight logic only, positioning handled by parent)
     return isActive 
         ? 'text-church-accent font-bold' 
         : 'text-gray-200 hover:text-white hover:font-bold font-normal';
@@ -38,7 +35,6 @@ const Navbar: React.FC = () => {
         <div className="flex justify-between h-20">
           <div className="flex items-center">
             <Link to="/" className="flex-shrink-0 flex items-center gap-3">
-               {/* Updated container to handle non-square logos gracefully */}
                <div className="flex items-center justify-center">
                  <img className="h-10 w-auto object-contain" src={ASSETS.STREAMING_LOGO} alt="Church Logo" />
                </div>
@@ -49,7 +45,7 @@ const Navbar: React.FC = () => {
             </Link>
           </div>
           
-          {/* Desktop Menu */}
+          {/* Desktop Nav */}
           <div className="hidden md:flex items-center space-x-8">
             {navLinks.map((link) => (
               <Link
@@ -57,11 +53,6 @@ const Navbar: React.FC = () => {
                 to={link.path}
                 className="relative text-sm uppercase tracking-wide group"
               >
-                {/* 
-                   Layout Shift Fix: 
-                   1. Render an invisible, bold copy of the text to reserve the maximum width.
-                   2. Render the actual text absolutely positioned over it.
-                */}
                 <span className="invisible font-bold" aria-hidden="true">{link.name}</span>
                 <span 
                     className={`absolute inset-0 flex items-center justify-center transition-colors duration-200 ${getLinkClasses(link.path)}`}
@@ -71,29 +62,23 @@ const Navbar: React.FC = () => {
               </Link>
             ))}
             
-            <div className="flex items-center space-x-3">
-              <a 
-                href={CHURCH_INFO.facebookUrl} 
-                target="_blank" 
-                rel="noreferrer"
-                className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-full transition"
-                aria-label="Facebook"
-              >
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-              </a>
-              <a 
-                href={CHURCH_INFO.youtubeUrl} 
-                target="_blank" 
-                rel="noreferrer"
-                className="bg-red-600 hover:bg-red-700 text-white p-2 rounded-full transition"
-                aria-label="YouTube"
-              >
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.498-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-              </a>
+            {/* Social Icons Desktop */}
+            <div className="flex items-center space-x-4 ml-4 pl-4 border-l border-blue-800">
+                <a href={CHURCH_INFO.facebookUrl} target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-colors">
+                    <span className="sr-only">Facebook</span>
+                    <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path fillRule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clipRule="evenodd" />
+                    </svg>
+                </a>
+                <a href={CHURCH_INFO.youtubeUrl} target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-colors">
+                    <span className="sr-only">YouTube</span>
+                    <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path fillRule="evenodd" d="M19.812 5.418c.861.23 1.538.907 1.768 1.768C21.998 8.746 22 12 22 12s0 3.255-.418 4.814a2.504 2.504 0 0 1-1.768 1.768c-1.56.419-7.814.419-7.814.419s-6.255 0-7.814-.419a2.505 2.505 0 0 1-1.768-1.768C2 15.255 2 12 2 12s0-3.254.418-4.814a2.506 2.506 0 0 1 1.768-1.768C5.744 5 11.998 5 11.998 5s6.255 0 7.814.418zM15.194 12 10 15V9l5.194 3z" clipRule="evenodd" />
+                    </svg>
+                </a>
             </div>
           </div>
 
-          {/* Mobile Menu Button */}
           <div className="flex items-center md:hidden">
             <button
               onClick={toggleMenu}
@@ -101,11 +86,11 @@ const Navbar: React.FC = () => {
             >
               <span className="sr-only">Open main menu</span>
               {!isOpen ? (
-                <svg className="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <svg className="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
               ) : (
-                <svg className="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <svg className="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               )}
@@ -114,7 +99,6 @@ const Navbar: React.FC = () => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
       {isOpen && (
         <div className="md:hidden bg-church-primary border-t border-blue-800">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
@@ -128,6 +112,22 @@ const Navbar: React.FC = () => {
                 {link.name}
               </Link>
             ))}
+            
+            {/* Mobile Social Links */}
+            <div className="flex space-x-6 px-3 py-4 border-t border-blue-800 mt-2">
+                <a href={CHURCH_INFO.facebookUrl} target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white flex items-center gap-2">
+                    <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path fillRule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clipRule="evenodd" />
+                    </svg>
+                    <span>Facebook</span>
+                </a>
+                <a href={CHURCH_INFO.youtubeUrl} target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white flex items-center gap-2">
+                    <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path fillRule="evenodd" d="M19.812 5.418c.861.23 1.538.907 1.768 1.768C21.998 8.746 22 12 22 12s0 3.255-.418 4.814a2.504 2.504 0 0 1-1.768 1.768c-1.56.419-7.814.419-7.814.419s-6.255 0-7.814-.419a2.505 2.505 0 0 1-1.768-1.768C2 15.255 2 12 2 12s0-3.254.418-4.814a2.506 2.506 0 0 1 1.768-1.768C5.744 5 11.998 5 11.998 5s6.255 0 7.814.418zM15.194 12 10 15V9l5.194 3z" clipRule="evenodd" />
+                    </svg>
+                    <span>YouTube</span>
+                </a>
+            </div>
           </div>
         </div>
       )}

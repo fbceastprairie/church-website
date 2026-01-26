@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import Layout from '../../components/Layout';
-import { BlogPost as BlogPostType } from '../../types';
-import { getPostById } from '../../services/db';
+import Layout from '../../components/Layout.tsx';
+import { BlogPost as BlogPostType } from '../../types.ts';
+import { getPostById } from '../../services/db.ts';
 
 const BlogPost: React.FC = () => {
   const { id } = useParams<{ id: string }>();

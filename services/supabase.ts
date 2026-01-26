@@ -1,17 +1,30 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Safely access environment variables. 
-// We default to an empty object if (import.meta as any).env is undefined to prevent crashes.
-const env = (import.meta as any).env || {};
+// Robust environment variable detection
+const getEnv = (key: string): string | undefined => {
+  // Check common locations for environment variables
+  if (typeof (window as any).process !== 'undefined' && (window as any).process.env) {
+    return (window as any).process.env[key];
+  }
+  
+  // Vite / ESM context
+  try {
+    return (import.meta as any).env[key];
+  } catch (e) {
+    return undefined;
+  }
+};
 
-export const supabaseUrl = env.VITE_SUPABASE_URL;
-export const supabaseAnonKey = env.VITE_SUPABASE_ANON_KEY;
+export const supabaseUrl = getEnv('VITE_SUPABASE_URL') || getEnv('SUPABASE_URL');
+export const supabaseAnonKey = getEnv('VITE_SUPABASE_ANON_KEY') || getEnv('SUPABASE_ANON_KEY');
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn("Supabase Environment Variables are missing. Please check your .env file or Netlify settings.");
-}
-
+// We use a safe placeholder to prevent the constructor from throwing a hard error 
+// that stops the whole app from mounting.
 export const supabase = createClient(
   supabaseUrl || 'https://placeholder.supabase.co', 
   supabaseAnonKey || 'placeholder'
 );
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.warn("FBC Website: Supabase keys not found. Database features will be disabled.");
+}

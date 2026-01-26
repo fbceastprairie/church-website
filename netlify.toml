@@ -1,4 +1,10 @@
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+# PROJECT MIGRATED TO VERCEL / CLOUDFLARE
+# 
+# We have moved away from Netlify due to the 300 build-minute limit.
+# Use vercel.json for Vercel.
+# Use public/_redirects for Cloudflare Pages.
+
+# [[redirects]]
+#   from = "/*"
+#   to = "/index.html"
+#   status = 200

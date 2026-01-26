@@ -1,4 +1,5 @@
-import { ServiceTime } from "./types";
+
+import { ServiceTime } from "./types.ts";
 
 // In a real deployment, these would point to the actual uploaded files.
 // For this demo, we use variables so the user can easily swap them later.
@@ -9,9 +10,8 @@ export const ASSETS = {
   STAINED_GLASS_ZOOM: '/zoomed_in_stained_glass_mural.jpg',
   BUILDING_EXTERIOR: '/ourChurchBuildingAndFlags.jpg',
   
-  // INSTRUCTION: To use your own logo, right-click your logo on Facebook or your old site, 
-  // select "Copy Image Address", and paste it inside the quotes below.
-  // Example: 'https://scontent.fmem1-2.fna.fbcdn.net/...'
+  // INSTRUCTION: Place your logo image inside the 'public' folder and name it 'logo.png'.
+  // The host (Vercel/Netlify) will serve this file from the root of your domain.
   STREAMING_LOGO: '/fbc-logo.png', 
 };
 
@@ -28,5 +28,5 @@ export const SERVICE_TIMES: ServiceTime[] = [
   { day: "Sunday", time: "9:30 AM", label: "Sunday School" },
   { day: "Sunday", time: "10:30 AM", label: "Worship Service" },
   { day: "Sunday", time: "5:00 PM", label: "Evening Service" },
-  { day: "Wednesday", time: "6:00 PM", label: "Mid-Week Service" },
+  { day: "Wednesday", time: "6:00 PM", label: "Wednesday Bible Study" },
 ];

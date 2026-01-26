@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import Layout from '../../components/Layout';
-import { getCurrentUser, logout, updatePassword } from '../../services/auth';
-import { getPosts, deletePost, getUsers, addUser, deleteUser, updateUserRole } from '../../services/db';
-import { BlogPost, User, UserRole } from '../../types';
+import Layout from '../../components/Layout.tsx';
+import { getCurrentUser, logout, updatePassword } from '../../services/auth.ts';
+import { getPosts, deletePost, getUsers, addUser, deleteUser, updateUserRole } from '../../services/db.ts';
+import { BlogPost, User, UserRole } from '../../types.ts';
 
 const AdminDashboard: React.FC = () => {
   const navigate = useNavigate();

@@ -1,6 +1,6 @@
 import React from 'react';
-import Layout from '../components/Layout';
-import { CHURCH_INFO, SERVICE_TIMES } from '../constants';
+import Layout from '../components/Layout.tsx';
+import { CHURCH_INFO, SERVICE_TIMES } from '../constants.ts';
 
 const Contact: React.FC = () => {
   return (
@@ -50,9 +50,7 @@ const Contact: React.FC = () => {
               <iframe 
                 title="Google Maps Location"
                 className="w-full h-full border-0"
-                src={`https://www.google.com/maps/embed?origin=mfe&pb=!1m3!2m1!1sFirst+Baptist+Church+205+Pearl+St+East+Prairie+MO+63845!6i15!3m1!1sen!5m1!1sen`} 
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
+                src="https://maps.google.com/maps?width=100%25&height=600&hl=en&q=First%20Baptist%20Church%20205%20Pearl%20St%20East%20Prairie%20MO%2063845&t=&z=15&ie=UTF8&iwloc=B&output=embed"
                 allowFullScreen
               ></iframe>
             </div>

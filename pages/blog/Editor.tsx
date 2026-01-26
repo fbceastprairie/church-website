@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import Layout from '../../components/Layout';
-import { getCurrentUser } from '../../services/auth';
-import { createPost, getPostById, updatePost } from '../../services/db';
-import { User, UserRole } from '../../types';
+import Layout from '../../components/Layout.tsx';
+import { getCurrentUser } from '../../services/auth.ts';
+import { createPost, getPostById, updatePost } from '../../services/db.ts';
+import { User, UserRole } from '../../types.ts';
 
 const Editor: React.FC = () => {
   const { id } = useParams<{ id: string }>();

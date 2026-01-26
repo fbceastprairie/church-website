@@ -1,17 +1,13 @@
+
+
 import { createClient } from '@supabase/supabase-js';
-import { supabase, supabaseUrl, supabaseAnonKey } from './supabase';
-import { BlogPost, UserRole } from "../types";
+import { supabase, supabaseUrl, supabaseAnonKey } from './supabase.ts';
+import { BlogPost, UserRole } from "../types.ts";
 
-// INITIALIZATION
-export const initializeDatabase = () => {
-  // No-op for Supabase
-};
-
-// --- USER OPERATIONS ---
+export const initializeDatabase = () => {};
 
 export const getUsers = async (): Promise<any[]> => {
   const { data, error } = await supabase.rpc('get_users');
-  
   if (error) {
     console.error('Error fetching users:', error);
     return [];
@@ -19,181 +15,150 @@ export const getUsers = async (): Promise<any[]> => {
   return data || [];
 };
 
-/**
- * Creates a new user using a temporary Supabase client.
- * This ensures the password is hashed correctly by Supabase itself,
- * avoiding the issues with manual SQL insertion.
- */
 export const addUser = async (email: string, password: string, role: UserRole): Promise<void> => {
-  // 1. Create a temporary client that DOES NOT persist session (Memory storage).
-  // This prevents the Admin from being logged out when creating a new user.
+  /* Fixed: Use V2 style options nested under 'auth' */
   const tempClient = createClient(
     supabaseUrl || '',
     supabaseAnonKey || '',
     {
-        auth: {
-            persistSession: false,
-            autoRefreshToken: false,
-            detectSessionInUrl: false
-        }
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+        detectSessionInUrl: false
+      }
     }
   );
 
-  // 2. Sign up the user officially
+  /* Fixed: Use V2 style signUp with a single configuration object and handle 'data' response */
   const { data, error: signUpError } = await tempClient.auth.signUp({
     email,
     password,
     options: {
-        data: { role } // Initial metadata
+      data: { role }
     }
   });
 
-  if (signUpError) throw new Error(signUpError.message);
-  if (!data.user) throw new Error("User creation failed. Email might be taken.");
+  const user = data?.user;
 
-  // 3. Auto-approve the user via SQL (Skip email verification step)
+  if (signUpError) throw new Error(signUpError.message);
+  if (!user) throw new Error("User creation failed.");
+
   const { error: rpcError } = await supabase.rpc('approve_new_user', {
-    target_user_id: data.user.id,
+    target_user_id: user.id,
     target_role: role
   });
 
-  if (rpcError) {
-    // If approval fails, try to cleanup (optional, but good practice)
-    console.error("Failed to approve user:", rpcError);
-    await supabase.rpc('delete_user', { target_user_id: data.user.id });
-    throw new Error("Failed to configure user permissions: " + rpcError.message);
-  }
+  if (rpcError) throw new Error(rpcError.message);
 };
 
 export const deleteUser = async (userId: string): Promise<void> => {
-  const { error } = await supabase.rpc('delete_user', {
-    target_user_id: userId
-  });
-
-  if (error) {
-    throw new Error(error.message);
-  }
+  const { error } = await supabase.rpc('delete_user', { target_user_id: userId });
+  if (error) throw new Error(error.message);
 };
 
 export const updateUserRole = async (userId: string, newRole: UserRole): Promise<void> => {
-  const { error } = await supabase.rpc('update_user_role', {
-    target_user_id: userId,
-    new_role: newRole
-  });
-
-  if (error) {
-    throw new Error(error.message);
-  }
+  const { error } = await supabase.rpc('update_user_role', { target_user_id: userId, new_role: newRole });
+  if (error) throw new Error(error.message);
 };
-
-// --- BLOG OPERATIONS ---
 
 export const getPosts = async (): Promise<BlogPost[]> => {
   const { data, error } = await supabase
     .from('posts')
     .select('*')
-    .order('createdAt', { ascending: false });
+    .order('created_at', { ascending: false });
 
-  if (error) {
-    console.error('Error loading posts:', error);
-    return [];
-  }
+  if (error) return [];
 
   return (data || []).map((post: any) => ({
-    ...post,
-    createdAt: post.created_at || post.createdAt,
-    updatedAt: post.updated_at || post.updatedAt,
-    authorId: post.author_id || post.authorId,
-    authorName: post.author_name || post.authorName,
-    videoUrl: post.video_url || post.videoUrl,
-    imageUrl: post.image_url || post.imageUrl
+    id: post.id,
+    title: post.title,
+    content: post.content,
+    imageUrl: post.image_url,
+    videoUrl: post.video_url,
+    authorId: post.author_id,
+    authorName: post.author_name,
+    createdAt: post.created_at,
+    updatedAt: post.updated_at
   }));
 };
 
 export const getPostById = async (id: string): Promise<BlogPost | undefined> => {
-  const { data, error } = await supabase
-    .from('posts')
-    .select('*')
-    .eq('id', id)
-    .single();
-
+  const { data, error } = await supabase.from('posts').select('*').eq('id', id).single();
   if (error || !data) return undefined;
 
   return {
-    ...data,
-    createdAt: data.created_at || data.createdAt,
-    updatedAt: data.updated_at || data.updatedAt,
-    authorId: data.author_id || data.authorId,
-    authorName: data.author_name || data.authorName,
-    videoUrl: data.video_url || data.videoUrl,
-    imageUrl: data.image_url || data.imageUrl
+    id: data.id,
+    title: data.title,
+    content: data.content,
+    imageUrl: data.image_url,
+    videoUrl: data.video_url,
+    authorId: data.author_id,
+    authorName: data.author_name,
+    createdAt: data.created_at,
+    updatedAt: data.updated_at
   };
 };
 
 export const createPost = async (post: Omit<BlogPost, 'id' | 'createdAt' | 'updatedAt'>): Promise<BlogPost> => {
-  const newPost = {
-    title: post.title,
-    content: post.content,
-    image_url: post.imageUrl, 
-    video_url: post.videoUrl,
-    author_id: post.authorId,
-    author_name: post.authorName,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
-  };
-
+  /* Fixed: Corrected property mapping from camelCase authorName to snake_case author_name */
   const { data, error } = await supabase
     .from('posts')
-    .insert([newPost])
+    .insert([{
+      title: post.title,
+      content: post.content,
+      image_url: post.imageUrl, 
+      video_url: post.videoUrl,
+      author_id: post.authorId,
+      author_name: post.authorName
+    }])
     .select()
     .single();
 
   if (error) throw new Error(error.message);
-
+  
   return {
-    ...data,
-    createdAt: data.created_at,
-    updatedAt: data.updated_at,
+    id: data.id,
+    title: data.title,
+    content: data.content,
+    imageUrl: data.image_url,
+    videoUrl: data.video_url,
     authorId: data.author_id,
     authorName: data.author_name,
-    videoUrl: data.video_url,
-    imageUrl: data.image_url
+    createdAt: data.created_at,
+    updatedAt: data.updated_at
   };
 };
 
 export const updatePost = async (id: string, updates: Partial<BlogPost>): Promise<BlogPost> => {
-  const dbUpdates: any = {};
-  if (updates.title) dbUpdates.title = updates.title;
-  if (updates.content) dbUpdates.content = updates.content;
-  if (updates.imageUrl) dbUpdates.image_url = updates.imageUrl;
-  if (updates.videoUrl) dbUpdates.video_url = updates.videoUrl;
-  dbUpdates.updated_at = new Date().toISOString();
-
   const { data, error } = await supabase
     .from('posts')
-    .update(dbUpdates)
+    .update({
+      title: updates.title,
+      content: updates.content,
+      image_url: updates.imageUrl,
+      video_url: updates.videoUrl,
+      updated_at: new Date().toISOString()
+    })
     .eq('id', id)
     .select()
     .single();
 
   if (error) throw new Error(error.message);
-
+  
   return {
-    ...data,
-    createdAt: data.created_at,
-    updatedAt: data.updated_at,
+    id: data.id,
+    title: data.title,
+    content: data.content,
+    imageUrl: data.image_url,
+    videoUrl: data.video_url,
     authorId: data.author_id,
     authorName: data.author_name,
-    videoUrl: data.video_url,
-    imageUrl: data.image_url
+    createdAt: data.created_at,
+    updatedAt: data.updated_at
   };
 };
 
 export const deletePost = async (id: string): Promise<void> => {
-  const { error } = await supabase
-    .from('posts')
-    .delete()
-    .eq('id', id);
-
+  const { error } = await supabase.from('posts').delete().eq('id', id);
   if (error) throw new Error(error.message);
 };

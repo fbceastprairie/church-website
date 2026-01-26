@@ -3,11 +3,18 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>First Baptist Church East Prairie</title>
+    <title>First Baptist Church | East Prairie, MO</title>
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
     <script>
-      tailwind.config = {
+      window.tailwind.config = {
         theme: {
           extend: {
             fontFamily: {
@@ -16,48 +23,68 @@
             },
             colors: {
               church: {
-                primary: '#1e3a8a', // Deep Blue (Stained Glass)
-                accent: '#d97706', // Gold/Amber (Light)
-                secondary: '#991b1b', // Red (Details)
-                light: '#f3f4f6',
-                dark: '#111827',
+                primary: '#1e3a8a',
+                accent: '#d97706',
+                gold: '#fbbf24',
+                dark: '#0f172a',
               }
             }
           }
         }
       }
     </script>
-    <style>
-      /* Custom scrollbar for webkit */
-      ::-webkit-scrollbar {
-        width: 8px;
-      }
-      ::-webkit-scrollbar-track {
-        background: #f1f1f1; 
-      }
-      ::-webkit-scrollbar-thumb {
-        background: #888; 
-        border-radius: 4px;
-      }
-      ::-webkit-scrollbar-thumb:hover {
-        background: #555; 
-      }
-    </style>
-<script type="importmap">
+
+    <script type="importmap">
 {
   "imports": {
-    "react": "https://esm.sh/react@^19.2.3",
+    "react": "https://esm.sh/react@19.0.0",
+    "react-dom": "https://esm.sh/react-dom@19.0.0",
+    "react-dom/client": "https://esm.sh/react-dom@19.0.0/client",
+    "react-router-dom": "https://esm.sh/react-router-dom@6.28.1?deps=react@19.0.0,react-dom@19.0.0",
+    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2.47.10",
+    "vite": "https://esm.sh/vite@^7.3.1",
+    "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.2",
     "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
-    "react/": "https://esm.sh/react@^19.2.3/",
-    "react-router-dom": "https://esm.sh/react-router-dom@^7.13.0",
-    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@^2.91.1"
+    "react/": "https://esm.sh/react@^19.2.3/"
   }
 }
 </script>
-</head>
-  <body class="bg-gray-50 text-gray-900 antialiased">
+    <style>
+      body { margin: 0; padding: 0; background-color: #ffffff; }
+      #loading-screen {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: white;
+        z-index: 9999;
+        transition: opacity 0.5s ease;
+        font-family: 'Merriweather', serif;
+        color: #1e3a8a;
+      }
+      .spinner {
+        width: 48px;
+        height: 48px;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #d97706;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-bottom: 24px;
+      }
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="loading-screen">
+      <div class="spinner"></div>
+      <p style="font-weight: bold; letter-spacing: 0.05em;">Loading Church Website...</p>
+    </div>
     <div id="root"></div>
-    <!-- Vite will handle the typescript import during the build process -->
     <script type="module" src="./index.tsx"></script>
   </body>
 </html>

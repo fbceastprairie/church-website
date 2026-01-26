@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import Layout from '../../components/Layout';
-import { BlogPost } from '../../types';
-import { getPosts, initializeDatabase } from '../../services/db';
+import Layout from '../../components/Layout.tsx';
+import { BlogPost } from '../../types.ts';
+import { getPosts, initializeDatabase } from '../../services/db.ts';
 import { Link } from 'react-router-dom';
 
 const BlogList: React.FC = () => {

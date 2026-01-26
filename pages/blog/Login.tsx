@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Layout from '../../components/Layout';
-import { login } from '../../services/auth';
-import { initializeDatabase } from '../../services/db';
+import Layout from '../../components/Layout.tsx';
+import { login } from '../../services/auth.ts';
+import { initializeDatabase } from '../../services/db.ts';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
