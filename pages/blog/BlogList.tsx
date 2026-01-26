@@ -23,6 +23,16 @@ const BlogList: React.FC = () => {
     fetchPosts();
   }, []);
 
+  // Helper to remove markdown symbols for clean preview text
+  const stripMarkdown = (text: string) => {
+    if (!text) return '';
+    return text
+      .replace(/(\*\*|__)(.*?)\1/g, '$2') // Remove Bold
+      .replace(/(\*|_)(.*?)\1/g, '$2')    // Remove Italic
+      .replace(/^(\- |\* |\d+\. )/gm, '') // Remove List bullets
+      .replace(/\n+/g, ' ');              // Collapse newlines
+  };
+
   return (
     <Layout>
       <div className="bg-white py-12">
@@ -75,7 +85,7 @@ const BlogList: React.FC = () => {
                         </Link>
                       </h3>
                       <p className="text-gray-600 line-clamp-3 mb-4">
-                        {post.content}
+                        {stripMarkdown(post.content)}
                       </p>
                     </div>
                     <Link to={`/blog/post/${post.id}`} className="inline-block text-church-accent font-semibold hover:text-yellow-600">

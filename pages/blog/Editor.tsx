@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Layout from '../../components/Layout.tsx';
 import { getCurrentUser } from '../../services/auth.ts';
@@ -9,6 +9,8 @@ const Editor: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const isEditing = !!id;
+  
+  const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
   const [user, setUser] = useState<User | null>(null);
   const [title, setTitle] = useState('');
@@ -47,6 +49,44 @@ const Editor: React.FC = () => {
 
     init();
   }, [id, isEditing, navigate]);
+
+  const insertFormat = (type: 'bold' | 'italic' | 'ul' | 'ol') => {
+    const textarea = textAreaRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const value = textarea.value;
+    const selected = value.substring(start, end);
+    
+    let before = value.substring(0, start);
+    let after = value.substring(end);
+    let insertion = '';
+
+    // Helper to check if we need a newline before inserting a list
+    const needsNewline = start > 0 && value[start - 1] !== '\n';
+
+    switch (type) {
+        case 'bold':
+            insertion = `**${selected || 'bold text'}**`;
+            break;
+        case 'italic':
+            insertion = `*${selected || 'italic text'}*`;
+            break;
+        case 'ul':
+            insertion = `${needsNewline ? '\n' : ''}- ${selected || 'List item'}`;
+            break;
+        case 'ol':
+            insertion = `${needsNewline ? '\n' : ''}1. ${selected || 'List item'}`;
+            break;
+    }
+
+    const newValue = before + insertion + after;
+    setContent(newValue);
+    
+    // Restore focus
+    setTimeout(() => textarea.focus(), 10);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -128,15 +168,31 @@ const Editor: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">Content</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Content</label>
+                
+                {/* Formatting Toolbar */}
+                <div className="flex space-x-2 mb-2 p-1 bg-gray-50 border rounded-md w-fit">
+                    <button type="button" onClick={() => insertFormat('bold')} className="p-1 hover:bg-gray-200 rounded font-bold text-gray-700 w-8" title="Bold">B</button>
+                    <button type="button" onClick={() => insertFormat('italic')} className="p-1 hover:bg-gray-200 rounded italic text-gray-700 w-8" title="Italic">I</button>
+                    <div className="w-px bg-gray-300 mx-1"></div>
+                    <button type="button" onClick={() => insertFormat('ul')} className="p-1 hover:bg-gray-200 rounded text-gray-700 w-8 flex justify-center" title="Bulleted List">
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd"/></svg>
+                    </button>
+                    <button type="button" onClick={() => insertFormat('ol')} className="p-1 hover:bg-gray-200 rounded text-gray-700 w-8 flex justify-center" title="Numbered List">
+                         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd"/></svg>
+                    </button>
+                </div>
+
                 <textarea
+                  ref={textAreaRef}
                   required
-                  rows={12}
-                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-church-primary focus:border-church-primary font-sans"
+                  rows={15}
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-church-primary focus:border-church-primary font-mono text-sm"
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
-                  placeholder="Write your article here..."
+                  placeholder="Write your article here... Use the toolbar above for styling."
                 />
+                <p className="mt-1 text-xs text-gray-500">Supports Markdown: **bold**, *italic*, - list</p>
               </div>
 
               <div className="flex justify-end">

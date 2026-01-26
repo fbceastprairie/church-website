@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import Layout from '../../components/Layout.tsx';
 import { BlogPost as BlogPostType } from '../../types.ts';
 import { getPostById } from '../../services/db.ts';
+import MarkdownRenderer from '../../components/MarkdownRenderer.tsx';
 
 const BlogPost: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -82,8 +83,9 @@ const BlogPost: React.FC = () => {
             </div>
         )}
 
-        <div className="prose prose-lg prose-blue mx-auto text-gray-700 whitespace-pre-wrap">
-            {post.content}
+        {/* Use the new Markdown Renderer for content */}
+        <div className="prose prose-lg prose-blue mx-auto text-gray-700">
+            <MarkdownRenderer content={post.content} />
         </div>
 
         <div className="mt-12 pt-8 border-t border-gray-200">
