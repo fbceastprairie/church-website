@@ -8,7 +8,7 @@ export const ASSETS = {
   STAINED_GLASS_MAIN: 'https://images.unsplash.com/photo-1576510967347-6df1292027b6?q=80&w=1920&auto=format&fit=crop', 
   STAINED_GLASS_ZOOM: 'https://images.unsplash.com/photo-1491566102026-b924dc1c569f?q=80&w=800&auto=format&fit=crop',
   BUILDING_EXTERIOR: 'https://images.unsplash.com/photo-1548625361-1b96a9c80d83?q=80&w=1920&auto=format&fit=crop',
-  STREAMING_LOGO: 'https://img.icons8.com/ios-filled/100/1e3a8a/dove.png', // Placeholder for the dove logo
+  STREAMING_LOGO: '/fbc-logo.png', // Placeholder for the dove logo
 };
 
 export const CHURCH_INFO = {
