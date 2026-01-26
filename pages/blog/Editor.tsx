@@ -168,17 +168,20 @@ const Editor: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Content</label>
+                <div className="flex justify-between items-end mb-2">
+                    <label className="block text-sm font-medium text-gray-700">Content</label>
+                </div>
                 
                 {/* Formatting Toolbar */}
-                <div className="flex space-x-2 mb-2 p-1 bg-gray-50 border rounded-md w-fit">
-                    <button type="button" onClick={() => insertFormat('bold')} className="p-1 hover:bg-gray-200 rounded font-bold text-gray-700 w-8" title="Bold">B</button>
-                    <button type="button" onClick={() => insertFormat('italic')} className="p-1 hover:bg-gray-200 rounded italic text-gray-700 w-8" title="Italic">I</button>
-                    <div className="w-px bg-gray-300 mx-1"></div>
-                    <button type="button" onClick={() => insertFormat('ul')} className="p-1 hover:bg-gray-200 rounded text-gray-700 w-8 flex justify-center" title="Bulleted List">
+                <div className="flex items-center space-x-1 mb-2 p-1 bg-gray-100 border border-gray-300 rounded-md w-fit">
+                    <span className="text-xs font-semibold text-gray-500 px-2 select-none uppercase tracking-wide">Format:</span>
+                    <button type="button" onClick={() => insertFormat('bold')} className="p-1 hover:bg-white rounded font-bold text-gray-700 w-8 border border-transparent hover:border-gray-200 transition-colors" title="Bold">B</button>
+                    <button type="button" onClick={() => insertFormat('italic')} className="p-1 hover:bg-white rounded italic text-gray-700 w-8 border border-transparent hover:border-gray-200 transition-colors" title="Italic">I</button>
+                    <div className="w-px h-5 bg-gray-300 mx-1"></div>
+                    <button type="button" onClick={() => insertFormat('ul')} className="p-1 hover:bg-white rounded text-gray-700 w-8 flex justify-center border border-transparent hover:border-gray-200 transition-colors" title="Bulleted List">
                         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd"/></svg>
                     </button>
-                    <button type="button" onClick={() => insertFormat('ol')} className="p-1 hover:bg-gray-200 rounded text-gray-700 w-8 flex justify-center" title="Numbered List">
+                    <button type="button" onClick={() => insertFormat('ol')} className="p-1 hover:bg-white rounded text-gray-700 w-8 flex justify-center border border-transparent hover:border-gray-200 transition-colors" title="Numbered List">
                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd"/></svg>
                     </button>
                 </div>
