@@ -8,8 +8,21 @@ const Navbar: React.FC = () => {
 
   const toggleMenu = () => setIsOpen(!isOpen);
 
-  const isActive = (path: string) => {
-    return location.pathname === path ? 'text-church-accent font-bold' : 'text-gray-200 hover:text-white hover:font-bold';
+  // Helper for determining text style state
+  const getLinkClasses = (path: string, isMobile = false) => {
+    const isActive = location.pathname === path;
+    
+    if (isMobile) {
+        // Mobile Layout (Simple Vertical List)
+        return isActive 
+            ? 'text-church-accent font-bold' 
+            : 'text-gray-200 hover:text-white hover:font-bold';
+    }
+
+    // Desktop Layout (Color & Weight logic only, positioning handled by parent)
+    return isActive 
+        ? 'text-church-accent font-bold' 
+        : 'text-gray-200 hover:text-white hover:font-bold font-normal';
   };
 
   const navLinks = [
@@ -41,9 +54,19 @@ const Navbar: React.FC = () => {
               <Link
                 key={link.path}
                 to={link.path}
-                className={`${isActive(link.path)} transition-colors duration-200 text-sm uppercase tracking-wide`}
+                className="relative text-sm uppercase tracking-wide group"
               >
-                {link.name}
+                {/* 
+                   Layout Shift Fix: 
+                   1. Render an invisible, bold copy of the text to reserve the maximum width.
+                   2. Render the actual text absolutely positioned over it.
+                */}
+                <span className="invisible font-bold" aria-hidden="true">{link.name}</span>
+                <span 
+                    className={`absolute inset-0 flex items-center justify-center transition-colors duration-200 ${getLinkClasses(link.path)}`}
+                >
+                    {link.name}
+                </span>
               </Link>
             ))}
             
@@ -99,7 +122,7 @@ const Navbar: React.FC = () => {
                 key={link.path}
                 to={link.path}
                 onClick={() => setIsOpen(false)}
-                className={`block px-3 py-2 rounded-md text-base font-medium ${isActive(link.path)}`}
+                className={`block px-3 py-2 rounded-md text-base font-medium ${getLinkClasses(link.path, true)}`}
               >
                 {link.name}
               </Link>
