@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import Layout from '../../components/Layout.tsx';
 import { getCurrentUser, logout, updatePassword } from '../../services/auth.ts';
-import { getPosts, deletePost, getUsers, addUser, deleteUser, updateUserRole } from '../../services/db.ts';
+import { getPosts, deletePost, getUsers, addUser, deleteUser, updateUserRole, updatePost } from '../../services/db.ts';
 import { BlogPost, User, UserRole } from '../../types.ts';
 
 const AdminDashboard: React.FC = () => {
@@ -11,6 +11,9 @@ const AdminDashboard: React.FC = () => {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [staffList, setStaffList] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  // URL Migration State
+  const [fixingSlugs, setFixingSlugs] = useState(false);
   
   // New User Form State (Admin Only)
   const [showAddUser, setShowAddUser] = useState(false);
@@ -61,6 +64,32 @@ const AdminDashboard: React.FC = () => {
       await deletePost(postId);
       const updatedPosts = await getPosts();
       setPosts(updatedPosts);
+    }
+  };
+
+  // --- MIGRATION HANDLER ---
+  const handleGenerateSlugs = async () => {
+    if (!user) return;
+    const postsToFix = posts.filter(p => !p.slug);
+    if (postsToFix.length === 0) return;
+
+    if (!window.confirm(`Found ${postsToFix.length} posts without friendly URLs. Generate them now?`)) return;
+
+    setFixingSlugs(true);
+    try {
+        let count = 0;
+        for (const post of postsToFix) {
+            // Updating with the existing title triggers the slug generation logic in db.ts
+            await updatePost(post.id, { title: post.title });
+            count++;
+        }
+        alert(`Successfully updated ${count} posts with new URLs.`);
+        await refreshData(user);
+    } catch (error) {
+        console.error(error);
+        alert("An error occurred while generating URLs. Check console for details.");
+    } finally {
+        setFixingSlugs(false);
     }
   };
 
@@ -130,6 +159,9 @@ const AdminDashboard: React.FC = () => {
 
   if (!user) return null;
 
+  // Check if there are posts missing slugs
+  const missingSlugsCount = posts.filter(p => !p.slug).length;
+
   return (
     <Layout>
       <div className="bg-gray-100 min-h-screen py-10">
@@ -157,6 +189,34 @@ const AdminDashboard: React.FC = () => {
             </div>
           </div>
 
+          {/* Migration Banner */}
+          {missingSlugsCount > 0 && (
+            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-8 rounded-r-md shadow-sm">
+                <div className="flex justify-between items-center">
+                    <div className="flex items-center">
+                        <svg className="h-6 w-6 text-yellow-500 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                        <div>
+                            <p className="text-sm font-bold text-yellow-800">
+                                {missingSlugsCount} articles are missing friendly URLs.
+                            </p>
+                            <p className="text-xs text-yellow-700">
+                                Old articles need to be updated to use the new "title-link" format.
+                            </p>
+                        </div>
+                    </div>
+                    <button 
+                        onClick={handleGenerateSlugs}
+                        disabled={fixingSlugs}
+                        className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded text-sm font-bold shadow-sm transition disabled:opacity-50"
+                    >
+                        {fixingSlugs ? 'Updating...' : 'Generate Missing URLs'}
+                    </button>
+                </div>
+            </div>
+          )}
+
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Left Column: Posts (Takes up 2 cols) */}
             <div className="lg:col-span-2 space-y-8">
@@ -176,6 +236,7 @@ const AdminDashboard: React.FC = () => {
                                 <thead className="bg-gray-50">
                                     <tr>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">URL Slug</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
                                         <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                                     </tr>
@@ -189,6 +250,15 @@ const AdminDashboard: React.FC = () => {
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <div className="text-sm font-medium text-gray-900 truncate max-w-[200px]">{post.title}</div>
                                                     {!canEdit && <span className="text-xs text-red-400">Read only</span>}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <div className="text-xs text-gray-500 font-mono truncate max-w-[150px]">
+                                                        {post.slug ? (
+                                                            <span className="text-green-600 bg-green-50 px-1 rounded">/{post.slug}</span>
+                                                        ) : (
+                                                            <span className="text-red-500 bg-red-50 px-1 rounded">Missing</span>
+                                                        )}
+                                                    </div>
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                                     {new Date(post.createdAt).toLocaleDateString()}
