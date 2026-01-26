@@ -50,7 +50,7 @@ const Contact: React.FC = () => {
               <iframe 
                 title="Google Maps Location"
                 className="w-full h-full border-0"
-                src={`https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3209.7615049382216!2d-89.38466868471926!3d36.77797897995324!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8878410298450143%3A0xe94132204634f1d4!2sFirst%20Baptist%20Church!5e0!3m2!1sen!2sus!4v1629812345678!5m2!1sen!2sus`} 
+                src={`https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3195.4510230306055!2d-89.38900129999999!3d36.78373519999999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8879b2a627d73d61%3A0x5f6b9e9ede6613ef!2s205%20Pearl%20St%2C%20East%20Prairie%2C%20MO%2063845!5e0!3m2!1sen!2sus!4v1769408695881!5m2!1sen!2sus`} 
                 loading="lazy"
               ></iframe>
             </div>
