@@ -22,7 +22,7 @@ const Home: React.FC = () => {
             Welcome to First Baptist
           </h1>
           <p className="text-xl md:text-2xl font-light italic mb-10 text-church-gold">
-            "Known by our stained glass, defined by our love for Jesus."
+            "Known locally by our stained glass, but defined by our love for Jesus."
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link to="/contact" className="bg-church-accent hover:bg-amber-700 text-white px-8 py-4 rounded-full font-bold transition-all transform hover:scale-105 shadow-xl">
