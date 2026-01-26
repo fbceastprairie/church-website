@@ -16,6 +16,10 @@ export const ASSETS = {
   
   // Generated logo placeholder. Replace this with '/logo.png' after uploading your actual file.
   STREAMING_LOGO: '/fbc-logo.png', 
+
+  // Default Blog Images (Unsplash placeholders)
+  DEFAULT_BLOG_THUMBNAIL: '/default-blog.jpg',
+  DEFAULT_VIDEO_THUMBNAIL: '/video-content.jpg', 
 };
 
 export const CHURCH_INFO = {
