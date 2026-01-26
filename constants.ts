@@ -31,5 +31,5 @@ export const SERVICE_TIMES: ServiceTime[] = [
   { day: "Sunday", time: "9:30 AM", label: "Sunday School" },
   { day: "Sunday", time: "10:30 AM", label: "Worship Service" },
   { day: "Sunday", time: "5:00 PM", label: "Evening Service" },
-  { day: "Wednesday", time: "6:00 PM", label: "Wednesday Bible Study" },
+  { day: "Wednesday", time: "6:00 PM", label: "Bible Study" },
 ];
