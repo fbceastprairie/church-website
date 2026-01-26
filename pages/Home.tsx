@@ -11,7 +11,7 @@ const Home: React.FC = () => {
         {/* Background Image with Overlay */}
         <div 
           className="absolute inset-0 bg-cover bg-center z-0"
-          style={{ backgroundImage: `url(${ASSETS.STAINED_GLASS_MAIN})` }}
+          style={{ backgroundImage: `url(${ASSETS.STAINED_GLASS_ZOOM})` }}
         >
           <div className="absolute inset-0 bg-black/60 mix-blend-multiply"></div>
           <div className="absolute inset-0 bg-gradient-to-t from-church-primary/90 to-transparent"></div>
