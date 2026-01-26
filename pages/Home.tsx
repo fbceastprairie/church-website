@@ -13,7 +13,7 @@ const Home: React.FC = () => {
           className="absolute inset-0 bg-cover bg-center z-0"
           style={{ backgroundImage: `url(${ASSETS.STAINED_GLASS_MAIN})` }}
         >
-          <div className="absolute inset-0 bg-black/40 mix-blend-multiply"></div>
+          <div className="absolute inset-0 bg-black/10 mix-blend-multiply"></div>
           <div className="absolute inset-0 bg-gradient-to-t from-church-primary/90 to-transparent"></div>
         </div>
 
