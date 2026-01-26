@@ -12,8 +12,10 @@ const Home: React.FC = () => {
           className="absolute inset-0 bg-cover bg-center z-0 scale-105"
           style={{ backgroundImage: `url(${ASSETS.STAINED_GLASS_MAIN})` }}
         >
-          <div className="absolute inset-0 bg-church-dark/70 mix-blend-multiply"></div>
-          <div className="absolute inset-0 bg-gradient-to-t from-church-dark via-transparent to-transparent"></div>
+          {/* Darkened overlay for better text visibility */}
+          <div className="absolute inset-0 bg-church-dark/90 mix-blend-multiply"></div>
+          {/* Stronger gradient from bottom and top */}
+          <div className="absolute inset-0 bg-gradient-to-t from-church-dark via-church-dark/40 to-black/50"></div>
         </div>
 
         <div className="relative z-10 text-center px-4 max-w-4xl">
