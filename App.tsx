@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Home from './pages/Home';
 import Give from './pages/Give';
 import Contact from './pages/Contact';
@@ -8,16 +8,10 @@ import BlogPost from './pages/blog/BlogPost';
 import Login from './pages/blog/Login';
 import AdminDashboard from './pages/blog/AdminDashboard';
 import Editor from './pages/blog/Editor';
-import { initializeDatabase } from './services/db';
 
 const App: React.FC = () => {
-  useEffect(() => {
-    // Initialize the mock database on app load
-    initializeDatabase();
-  }, []);
-
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/give" element={<Give />} />
@@ -32,8 +26,10 @@ const App: React.FC = () => {
         <Route path="/blog/admin" element={<AdminDashboard />} />
         <Route path="/blog/editor" element={<Editor />} />
         <Route path="/blog/editor/:id" element={<Editor />} />
+
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   );
 };
 
