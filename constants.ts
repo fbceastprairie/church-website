@@ -5,9 +5,9 @@ import { ServiceTime } from "./types";
 // Note: If you place the user's images in a 'public/assets' folder, update these paths.
 export const ASSETS = {
   // Using placeholders that match the user's description flavor
-  STAINED_GLASS_MAIN: 'https://images.unsplash.com/photo-1576510967347-6df1292027b6?q=80&w=1920&auto=format&fit=crop', 
-  STAINED_GLASS_ZOOM: 'https://images.unsplash.com/photo-1491566102026-b924dc1c569f?q=80&w=800&auto=format&fit=crop',
-  BUILDING_EXTERIOR: 'https://images.unsplash.com/photo-1548625361-1b96a9c80d83?q=80&w=1920&auto=format&fit=crop',
+  STAINED_GLASS_MAIN: '/stained_glass_mural_we_are_known_locally_for.jpg', 
+  STAINED_GLASS_ZOOM: '/zoomed_in_stained_glass_mural.jpg',
+  BUILDING_EXTERIOR: '/ourChurchBuildingAndFlags.jpg',
   
   // INSTRUCTION: To use your own logo, right-click your logo on Facebook or your old site, 
   // select "Copy Image Address", and paste it inside the quotes below.
