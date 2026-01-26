@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Home from './pages/Home.tsx';
@@ -18,7 +17,8 @@ const App: React.FC = () => {
         <Route path="/give" element={<Give />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/blog" element={<BlogList />} />
-        <Route path="/blog/post/:id" element={<BlogPost />} />
+        {/* Changed :id to :slug to support title-based URLs */}
+        <Route path="/blog/post/:slug" element={<BlogPost />} />
         <Route path="/blog/login" element={<Login />} />
         <Route path="/blog/admin" element={<AdminDashboard />} />
         <Route path="/blog/editor" element={<Editor />} />

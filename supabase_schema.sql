@@ -14,6 +14,14 @@ CREATE TABLE IF NOT EXISTS public.posts (
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- IMPORTANT: Migration for Friendly URLs (Run this if you have an existing table)
+-- Add the slug column
+ALTER TABLE public.posts ADD COLUMN IF NOT EXISTS slug TEXT;
+-- Add a unique constraint to ensure no duplicate URLs
+ALTER TABLE public.posts DROP CONSTRAINT IF EXISTS posts_slug_key;
+CREATE UNIQUE INDEX IF NOT EXISTS posts_slug_idx ON public.posts (slug);
+
+
 -- 2. Enable Row Level Security (RLS) - Safe to run multiple times
 ALTER TABLE public.posts ENABLE ROW LEVEL SECURITY;
 

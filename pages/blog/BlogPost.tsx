@@ -2,24 +2,25 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Layout from '../../components/Layout.tsx';
 import { BlogPost as BlogPostType } from '../../types.ts';
-import { getPostById } from '../../services/db.ts';
+import { getPostBySlugOrId } from '../../services/db.ts';
 import MarkdownRenderer from '../../components/MarkdownRenderer.tsx';
 
 const BlogPost: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+  // We renamed the route param to 'slug' in App.tsx
+  const { slug } = useParams<{ slug: string }>();
   const [post, setPost] = useState<BlogPostType | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchPost = async () => {
-      if (id) {
-        const data = await getPostById(id);
+      if (slug) {
+        const data = await getPostBySlugOrId(slug);
         setPost(data || null);
       }
       setLoading(false);
     };
     fetchPost();
-  }, [id]);
+  }, [slug]);
 
   if (loading) {
      return (

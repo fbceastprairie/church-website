@@ -11,6 +11,7 @@ export interface User {
 
 export interface BlogPost {
   id: string;
+  slug?: string; // URL-friendly version of the title
   title: string;
   content: string; // Supports basic text and newlines
   imageUrl?: string | null;

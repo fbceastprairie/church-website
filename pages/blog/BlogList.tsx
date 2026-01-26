@@ -82,47 +82,52 @@ const BlogList: React.FC = () => {
           ) : (
             <>
               <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-                {currentPosts.map((post) => (
-                  <article key={post.id} className="flex flex-col bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-lg transition overflow-hidden group">
-                    <div className="h-48 w-full overflow-hidden relative">
-                      <img 
-                        src={getPreviewImage(post)} 
-                        alt={post.title} 
-                        className="w-full h-full object-cover transition group-hover:scale-105 duration-500" 
-                      />
-                      
-                      {/* Video Indicator Overlay */}
-                      {post.videoUrl && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/10 transition">
-                            <div className="bg-black/60 rounded-full p-3 backdrop-blur-sm">
-                                <svg className="w-8 h-8 text-white pl-1" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" /></svg>
+                {currentPosts.map((post) => {
+                    // Fallback to ID if slug is missing (for old posts before migration)
+                    const postLink = `/blog/post/${post.slug || post.id}`;
+                    
+                    return (
+                      <article key={post.id} className="flex flex-col bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-lg transition overflow-hidden group">
+                        <Link to={postLink} className="block h-48 w-full overflow-hidden relative cursor-pointer">
+                          <img 
+                            src={getPreviewImage(post)} 
+                            alt={post.title} 
+                            className="w-full h-full object-cover transition group-hover:scale-105 duration-500" 
+                          />
+                          
+                          {/* Video Indicator Overlay */}
+                          {post.videoUrl && (
+                            <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/10 transition">
+                                <div className="bg-black/60 rounded-full p-3 backdrop-blur-sm">
+                                    <svg className="w-8 h-8 text-white pl-1" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" /></svg>
+                                </div>
                             </div>
-                        </div>
-                      )}
-                    </div>
+                          )}
+                        </Link>
 
-                    <div className="flex-1 p-6 flex flex-col justify-between">
-                      <div>
-                        <div className="flex items-center text-xs text-gray-500 mb-3">
-                          <span>{new Date(post.createdAt).toLocaleDateString()}</span>
-                          <span className="mx-2">•</span>
-                          <span>{post.authorName}</span>
-                        </div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-3">
-                          <Link to={`/blog/post/${post.id}`} className="hover:text-church-secondary">
-                            {post.title}
+                        <div className="flex-1 p-6 flex flex-col justify-between">
+                          <div>
+                            <div className="flex items-center text-xs text-gray-500 mb-3">
+                              <span>{new Date(post.createdAt).toLocaleDateString()}</span>
+                              <span className="mx-2">•</span>
+                              <span>{post.authorName}</span>
+                            </div>
+                            <h3 className="text-xl font-bold text-gray-900 mb-3">
+                              <Link to={postLink} className="hover:text-church-secondary">
+                                {post.title}
+                              </Link>
+                            </h3>
+                            <p className="text-gray-600 line-clamp-3 mb-4 text-sm">
+                              {stripMarkdown(post.content)}
+                            </p>
+                          </div>
+                          <Link to={postLink} className="inline-block text-church-accent font-semibold hover:text-yellow-600 text-sm uppercase tracking-wide">
+                            Read more &rarr;
                           </Link>
-                        </h3>
-                        <p className="text-gray-600 line-clamp-3 mb-4 text-sm">
-                          {stripMarkdown(post.content)}
-                        </p>
-                      </div>
-                      <Link to={`/blog/post/${post.id}`} className="inline-block text-church-accent font-semibold hover:text-yellow-600 text-sm uppercase tracking-wide">
-                        Read more &rarr;
-                      </Link>
-                    </div>
-                  </article>
-                ))}
+                        </div>
+                      </article>
+                    );
+                })}
               </div>
 
               {/* Pagination Controls */}
