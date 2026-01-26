@@ -18,18 +18,24 @@ const Home: React.FC = () => {
 
         <div className="relative z-10 text-center px-4 max-w-4xl">
           <img src={ASSETS.STREAMING_LOGO} alt="FBC Logo" className="h-24 w-auto mx-auto mb-8 drop-shadow-2xl" />
-          <h1 className="text-5xl md:text-7xl font-serif font-bold mb-6 tracking-tight">
+          <h1 className="text-5xl md:text-7xl font-serif font-bold mb-6 tracking-tight drop-shadow-lg">
             Welcome to First Baptist
           </h1>
-          <p className="text-xl md:text-2xl font-light italic mb-10 text-church-gold">
+          <p className="text-xl md:text-2xl font-light italic mb-10 text-white drop-shadow-lg leading-relaxed">
             "Known locally by our stained glass, but defined by our love for Jesus."
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Link to="/contact" className="bg-church-accent hover:bg-amber-700 text-white px-8 py-4 rounded-full font-bold transition-all transform hover:scale-105 shadow-xl">
+            {/* Primary Button: White with Blue Text */}
+            <Link to="/contact" className="bg-white hover:bg-gray-100 text-church-primary px-8 py-4 rounded-full font-bold transition-all transform hover:scale-105 shadow-xl text-lg">
               Plan Your Visit
             </Link>
-            <a href={CHURCH_INFO.facebookUrl} target="_blank" rel="noreferrer" className="bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/30 text-white px-8 py-4 rounded-full font-bold transition-all">
-              Watch Live
+            
+            {/* Secondary Button: Facebook Blue */}
+            <a href={CHURCH_INFO.facebookUrl} target="_blank" rel="noreferrer" className="bg-[#1877F2] hover:bg-[#166fe5] text-white px-8 py-4 rounded-full font-bold transition-all transform hover:scale-105 shadow-xl flex items-center gap-3 text-lg">
+              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.791-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+              </svg>
+              Watch on Facebook
             </a>
           </div>
         </div>
