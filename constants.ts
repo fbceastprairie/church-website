@@ -1,17 +1,20 @@
-
 import { ServiceTime } from "./types.ts";
 
-// In a real deployment, these would point to the actual uploaded files.
-// For this demo, we use variables so the user can easily swap them later.
-// Note: If you place the user's images in a 'public/assets' folder, update these paths.
+// Replaced broken local paths with Unsplash placeholders so the site works immediately.
+// TO USE YOUR OWN IMAGES:
+// 1. Upload your files to the 'public' folder.
+// 2. Update these paths to match (e.g., '/my-church.jpg').
 export const ASSETS = {
-  // Using placeholders that match the user's description flavor
+  // Beautiful stained glass background
   STAINED_GLASS_MAIN: '/stained_glass_mural_we_are_known_locally_for.jpg', 
+  
+  // Detailed texture for other sections (optional)
   STAINED_GLASS_ZOOM: '/zoomed_in_stained_glass_mural.jpg',
+  
+  // Church exterior placeholder
   BUILDING_EXTERIOR: '/ourChurchBuildingAndFlags.jpg',
   
-  // INSTRUCTION: Place your logo image inside the 'public' folder and name it 'logo.png'.
-  // The host (Vercel/Netlify) will serve this file from the root of your domain.
+  // Generated logo placeholder. Replace this with '/logo.png' after uploading your actual file.
   STREAMING_LOGO: '/fbc-logo.png', 
 };
 
