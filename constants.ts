@@ -12,7 +12,7 @@ export const ASSETS = {
   // INSTRUCTION: To use your own logo, right-click your logo on Facebook or your old site, 
   // select "Copy Image Address", and paste it inside the quotes below.
   // Example: 'https://scontent.fmem1-2.fna.fbcdn.net/...'
-  STREAMING_LOGO: 'https://img.icons8.com/ios-filled/100/1e3a8a/dove.png', 
+  STREAMING_LOGO: '/fbc-logo.png', 
 };
 
 export const CHURCH_INFO = {
