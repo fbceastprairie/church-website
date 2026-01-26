@@ -13,8 +13,8 @@ export interface BlogPost {
   id: string;
   title: string;
   content: string; // Supports basic text and newlines
-  imageUrl?: string;
-  videoUrl?: string; // YouTube embed URL
+  imageUrl?: string | null;
+  videoUrl?: string | null; // YouTube embed URL
   authorId: string;
   authorName: string;
   createdAt: string; // Changed to string for ISO dates from Supabase

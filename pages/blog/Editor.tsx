@@ -58,15 +58,15 @@ const Editor: React.FC = () => {
         await updatePost(id, {
           title,
           content,
-          imageUrl: imageUrl || undefined,
-          videoUrl: videoUrl || undefined,
+          imageUrl: imageUrl || null,
+          videoUrl: videoUrl || null,
         });
       } else {
         await createPost({
           title,
           content,
-          imageUrl: imageUrl || undefined,
-          videoUrl: videoUrl || undefined,
+          imageUrl: imageUrl || null,
+          videoUrl: videoUrl || null,
           authorId: user.id,
           authorName: user.username,
         });
