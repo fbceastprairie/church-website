@@ -19,3 +19,10 @@ build
 
 # MacOS System Files
 .DS_Store
+
+# Static Assets (Manually Managed)
+# Prevents AI/Code updates from tracking/deleting these binary files
+public/*.jpg
+public/*.png
+public/*.ico
+public/*.svg
