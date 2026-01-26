@@ -52,6 +52,8 @@ const Contact: React.FC = () => {
                 className="w-full h-full border-0"
                 src={`https://www.google.com/maps/embed?pb=!1m10!1m8!1m3!1d3195.4620821480953!2d-89.38946158191561!3d36.78346997635202!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2sus!4v1769409472564!5m2!1sen!2sus`} 
                 loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                allowFullScreen
               ></iframe>
             </div>
           </div>
