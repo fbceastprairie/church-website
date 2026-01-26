@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { HashRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import Give from './pages/Give';
 import Contact from './pages/Contact';
@@ -17,7 +17,7 @@ const App: React.FC = () => {
   }, []);
 
   return (
-    <HashRouter>
+    <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/give" element={<Give />} />
@@ -33,7 +33,7 @@ const App: React.FC = () => {
         <Route path="/blog/editor" element={<Editor />} />
         <Route path="/blog/editor/:id" element={<Editor />} />
       </Routes>
-    </HashRouter>
+    </BrowserRouter>
   );
 };
 
