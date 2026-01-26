@@ -38,8 +38,9 @@ const Navbar: React.FC = () => {
         <div className="flex justify-between h-20">
           <div className="flex items-center">
             <Link to="/" className="flex-shrink-0 flex items-center gap-3">
-               <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center overflow-hidden border-2 border-church-accent">
-                 <img className="h-8 w-auto" src={ASSETS.STREAMING_LOGO} alt="Dove Logo" />
+               {/* Updated container to handle non-square logos gracefully */}
+               <div className="flex items-center justify-center">
+                 <img className="h-10 w-auto object-contain" src={ASSETS.STREAMING_LOGO} alt="Church Logo" />
                </div>
                <div className="flex flex-col">
                   <span className="font-serif font-bold text-white text-lg tracking-wide leading-tight">First Baptist Church</span>

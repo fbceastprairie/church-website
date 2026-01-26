@@ -19,7 +19,12 @@ const Home: React.FC = () => {
 
         {/* Hero Content */}
         <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
-          <img src={ASSETS.STREAMING_LOGO} alt="Dove Logo" className="w-24 h-24 mx-auto mb-6 opacity-90 drop-shadow-2xl bg-white/10 rounded-full p-2 backdrop-blur-sm" />
+          {/* Logo: Adjusted to handle any aspect ratio better */}
+          <img 
+            src={ASSETS.STREAMING_LOGO} 
+            alt="Church Logo" 
+            className="h-24 w-auto mx-auto mb-6 opacity-90 drop-shadow-2xl" 
+          />
           <h1 className="text-4xl md:text-6xl font-serif font-bold text-white mb-4 drop-shadow-lg">
             Welcome Home
           </h1>
