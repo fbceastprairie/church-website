@@ -70,9 +70,9 @@ const Footer: React.FC = () => {
                   {/* Center: Description with separators */}
                   <div className="px-2">
                     <span className="text-gray-400 tracking-wide flex items-center gap-2 whitespace-nowrap">
-                        <span className="text-church-accent text-[10px]">♦</span>
+                        <span className="text-[14px]">♦</span>
                         {st.label}
-                        <span className="text-church-accent text-[10px]">♦</span>
+                        <span className="text-[14px]">♦</span>
                     </span>
                   </div>
 
