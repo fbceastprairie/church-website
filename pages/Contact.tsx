@@ -32,7 +32,7 @@ const Contact: React.FC = () => {
                   <svg className="w-6 h-6 text-church-accent mr-3 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                   <div>
                     <p className="font-bold text-gray-900">Address</p>
-                    <p><a href="https://www.google.com/maps/dir//First+Baptist+Church,+205+Pearl+St,+East+Prairie,+MO+63845/@36.7836993,-89.3891031,15z/data=!4m8!4m7!1m0!1m5!1m1!1s0x8879b2a89903d7ab:0x7f8f3ed16f9fbe6e!2m2!1d-89.3892226!2d36.7836993?entry=ttu&g_ep=EgoyMDI2MDEyMS4wIKXMDSoKLDEwMDc5MjA2OUgBUAM%3D">{CHURCH_INFO.address}</a></p>
+                    <p><a href="https://www.google.com/maps/dir//First+Baptist+Church,+205+Pearl+St,+East+Prairie,+MO+63845/@36.7836993,-89.3891031,15z/data=!4m8!4m7!1m0!1m5!1m1!1s0x8879b2a89903d7ab:0x7f8f3ed16f9fbe6e!2m2!1d-89.3892226!2d36.7836993?entry=ttu&g_ep=EgoyMDI2MDEyMS4wIKXMDSoKLDEwMDc5MjA2OUgBUAM%3D" target="_blank">{CHURCH_INFO.address}</a></p>
                   </div>
                 </div>
                 <div className="flex items-start">
