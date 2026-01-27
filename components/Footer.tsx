@@ -61,7 +61,7 @@ const Footer: React.FC = () => {
             <h3 className="text-white text-lg font-serif font-bold mb-4">Service Times</h3>
             <ul className="space-y-2 text-sm">
               {SERVICE_TIMES.map((st, idx) => (
-                <li key={idx} className=""flex items-center border-b border-gray-800 pb-2">
+                <li key={idx} className="flex items-center border-b border-gray-800 pb-2">
                   {/* Left: Day (flex-1 ensures it pushes against the right side equally) */}
                   <div className="flex-1 text-left">
                     <span className="text-gray-400">{st.day}</span>
