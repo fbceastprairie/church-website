@@ -22,7 +22,7 @@ const Footer: React.FC = () => {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                     <span className="text-sm text-gray-400 hover:text-white transition-colors">
-                      <a href="/contact">
+                      <a href="/#/contact">
                         {CHURCH_INFO.address}
                       </a>
                     </span>
