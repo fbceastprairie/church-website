@@ -93,7 +93,7 @@ const Login: React.FC = () => {
             </div>
           </form>
           <div className="mt-4 text-xs text-center text-gray-400">
-            <p>Use the email account created in your Supabase dashboard.</p>
+            <p>Please consult an administrator for password resets.</p>
           </div>
         </div>
       </div>
