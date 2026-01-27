@@ -61,10 +61,25 @@ const Footer: React.FC = () => {
             <h3 className="text-white text-lg font-serif font-bold mb-4">Service Times</h3>
             <ul className="space-y-2 text-sm">
               {SERVICE_TIMES.map((st, idx) => (
-                <li key={idx} className="flex justify-between border-b border-gray-800 pb-2">
-                  <span className="text-gray-400">{st.day}</span>
-                  <span className="text-gray-400">{st.label}</span>
-                  <span className="font-semibold text-white">{st.time}</span>
+                <li key={idx} className=""flex items-center border-b border-gray-800 pb-2">
+                  {/* Left: Day (flex-1 ensures it pushes against the right side equally) */}
+                  <div className="flex-1 text-left">
+                    <span className="text-gray-400">{st.day}</span>
+                  </div>
+                  
+                  {/* Center: Description with separators */}
+                  <div className="px-2">
+                    <span className="text-gray-500 text-xs uppercase tracking-wide flex items-center gap-2 whitespace-nowrap">
+                        <span className="text-church-accent text-[10px]">♦</span>
+                        {st.label}
+                        <span className="text-church-accent text-[10px]">♦</span>
+                    </span>
+                  </div>
+
+                  {/* Right: Time */}
+                  <div className="flex-1 text-right">
+                    <span className="font-semibold text-white">{st.time}</span>
+                  </div>
                 </li>
               ))}
             </ul>
