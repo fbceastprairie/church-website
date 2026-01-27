@@ -69,10 +69,10 @@ const Footer: React.FC = () => {
                   
                   {/* Center: Description with separators */}
                   <div className="px-2">
-                    <span className="text-gray-400 tracking-wide flex items-center gap-2 whitespace-nowrap">
-                        <span className="text-[14px]">♦</span>
+                    <span className="text-gray-500 tracking-wide flex items-center gap-2 whitespace-nowrap">
+                        <span className="text-[12px]">♦</span>
                         {st.label}
-                        <span className="text-[14px]">♦</span>
+                        <span className="text-[12px]">♦</span>
                     </span>
                   </div>
 
