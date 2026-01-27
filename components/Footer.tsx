@@ -63,7 +63,7 @@ const Footer: React.FC = () => {
               {SERVICE_TIMES.map((st, idx) => (
                 <li key={idx} className="flex justify-between border-b border-gray-800 pb-2">
                   <span className="text-gray-400">{st.day}</span>
-                  <span className="font-semibold text-white">{st.time} <span className="text-xs font-normal text-gray-500 ml-1">({st.label})</span></span>
+                  <span className="text-xs font-normal text-gray-500 ml-1">({st.label}) <span className="font-semibold text-white">{st.time}</span></span>
                 </li>
               ))}
             </ul>
