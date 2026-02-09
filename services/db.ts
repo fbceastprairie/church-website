@@ -212,3 +212,15 @@ export const deletePost = async (id: string): Promise<void> => {
   const { error } = await supabase.from('posts').delete().eq('id', id);
   if (error) throw new Error(error.message);
 };
+
+// --- SYSTEM HEARTBEAT ---
+// Calls the secure database function to Create and then Delete a post
+// This prevents Supabase from pausing the project due to inactivity.
+export const runKeepAlive = async (): Promise<void> => {
+    const { error } = await supabase.rpc('system_keep_alive');
+    if (error) {
+        console.warn("Heartbeat failed:", error.message);
+    } else {
+        console.log("System Heartbeat: 'Keep Alive' post created and deleted successfully.");
+    }
+};
