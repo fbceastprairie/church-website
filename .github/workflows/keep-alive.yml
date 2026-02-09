@@ -2,7 +2,9 @@ name: Keep Supabase Alive
 
 on:
   schedule:
+    # Runs at 00:00 UTC on Tuesday and Friday
     - cron: '0 0 * * 2,5'
+  # Allows you to run it manually from GitHub UI for testing
   workflow_dispatch:
 
 jobs:
@@ -22,15 +24,9 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps chromium
 
-      - name: Debug File System (Recursive)
-        run: |
-          echo "Current working directory: $(pwd)"
-          ls -R
-
-      - name: Run Playwright Test
+      - name: Run Playwright Script
         env:
           SITE_URL: ${{ secrets.SITE_URL }}
           TEST_USER_EMAIL: ${{ secrets.TEST_USER_EMAIL }}
           TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
-        # Explicitly run the specific file to bypass discovery issues
-        run: npx playwright test tests/keep-alive.spec.ts --config=playwright.config.ts
+        run: npm run test:e2e
