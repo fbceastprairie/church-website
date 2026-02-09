@@ -18,15 +18,24 @@ jobs:
           node-version: 18
       
       - name: Install Dependencies
-        # Changed from 'npm ci' to 'npm install' because package-lock.json might not exist in the repo
+        # Using npm install instead of ci as package-lock may not be present
         run: npm install
 
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps chromium
+
+      - name: Debug File System
+        run: |
+          echo "Listing root directory:"
+          ls -F
+          echo "Listing tests directory:"
+          ls -F tests/ || echo "tests/ directory not found"
 
       - name: Run Playwright Script
         env:
           SITE_URL: ${{ secrets.SITE_URL }}
           TEST_USER_EMAIL: ${{ secrets.TEST_USER_EMAIL }}
           TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
-        run: npx playwright test tests/keep-alive.spec.ts
+        # Run using the npm script which aliases 'playwright test'
+        # This uses playwright.config.ts to find the tests automatically
+        run: npm run test:e2e
