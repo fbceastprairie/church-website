@@ -1,10 +1,10 @@
 import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
-  // Search from the root directory
-  testDir: '.',
-  // Only look for .spec.ts files inside the tests folder
-  testMatch: 'tests/**/*.spec.ts',
+  // Search specifically in the tests directory
+  testDir: './tests',
+  // Look for .spec.ts files
+  testMatch: '**/*.spec.ts',
   
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
