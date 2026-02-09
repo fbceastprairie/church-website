@@ -134,8 +134,9 @@ const Editor: React.FC = () => {
           <div className="bg-white shadow rounded-lg p-6">
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700">Title</label>
+                <label htmlFor="post-title" className="block text-sm font-medium text-gray-700">Title</label>
                 <input
+                  id="post-title"
                   type="text"
                   required
                   className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-church-primary focus:border-church-primary"
@@ -145,8 +146,9 @@ const Editor: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">Image URL (Optional)</label>
+                <label htmlFor="post-image" className="block text-sm font-medium text-gray-700">Image URL (Optional)</label>
                 <input
+                  id="post-image"
                   type="url"
                   className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-church-primary focus:border-church-primary"
                   placeholder="https://..."
@@ -157,8 +159,9 @@ const Editor: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">YouTube Video URL (Optional)</label>
+                <label htmlFor="post-video" className="block text-sm font-medium text-gray-700">YouTube Video URL (Optional)</label>
                 <input
+                  id="post-video"
                   type="url"
                   className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-church-primary focus:border-church-primary"
                   placeholder="https://www.youtube.com/watch?v=..."
@@ -169,7 +172,7 @@ const Editor: React.FC = () => {
 
               <div>
                 <div className="flex justify-between items-end mb-2">
-                    <label className="block text-sm font-medium text-gray-700">Content</label>
+                    <label htmlFor="post-content" className="block text-sm font-medium text-gray-700">Content</label>
                 </div>
                 
                 {/* Formatting Toolbar */}
@@ -187,6 +190,7 @@ const Editor: React.FC = () => {
                 </div>
 
                 <textarea
+                  id="post-content"
                   ref={textAreaRef}
                   required
                   rows={15}
