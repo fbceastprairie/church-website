@@ -16,7 +16,7 @@ const Give: React.FC = () => {
           <h2 className="text-2xl font-bold text-gray-800 mb-6">Online Tithes & Offerings</h2>
           
           <div className="mb-8 w-full">
-            <div style={{ position: 'relative', overflow: 'hidden', height: '800px', width: '100%' }}>
+            <div style={{ position: 'relative', overflow: 'hidden', height: '600px', width: '100%' }}>
               <iframe 
                 title='Donation form powered by Zeffy' 
                 style={{ position: 'absolute', border: 0, top: 0, left: 0, bottom: 0, right: 0, width: '100%', height: '100%' }} 
