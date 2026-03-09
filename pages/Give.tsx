@@ -15,21 +15,15 @@ const Give: React.FC = () => {
         <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-8 text-center">
           <h2 className="text-2xl font-bold text-gray-800 mb-6">Online Tithes & Offerings</h2>
           
-          <div className="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-12 mb-8">
-            <p className="text-gray-500 mb-4 font-semibold">Secure Giving Widget Area</p>
-            <p className="text-sm text-gray-400">
-              (Administrator: Paste your payment processor's embed code here in the source code of <code>pages/Give.tsx</code>)
-            </p>
-            {/* 
-              PASTE EMBED CODE BELOW THIS LINE 
-              Example: <iframe src="..." ...></iframe> 
-            */}
-            
-            <div className="mt-8">
-                <button className="bg-church-accent text-white px-6 py-3 rounded font-bold shadow hover:bg-yellow-600 transition">
-                    Donate Now (Demo Button)
-                </button>
-            </div>
+          <div className="mb-8 w-full">
+            <div style={{ position: 'relative', overflow: 'hidden', height: '800px', width: '100%' }}>
+              <iframe 
+                title='Donation form powered by Zeffy' 
+                style={{ position: 'absolute', border: 0, top: 0, left: 0, bottom: 0, right: 0, width: '100%', height: '100%' }} 
+                src='https://www.zeffy.com/embed/donation-form/general-fund-86' 
+                allow="payment" 
+              ></iframe>
+            </div> 
           </div>
 
           <div className="text-left text-gray-600 space-y-4">
